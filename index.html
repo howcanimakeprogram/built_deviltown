@@ -107,14 +107,6 @@ pre {
      0 0 64px rgba(255,255,255,0.3);
 }
 
-.hint {
-  position: fixed;
-  bottom: 12px;
-  left: 14px;
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
-  z-index: 20;
-}
 </style>
 </head>
 
@@ -128,40 +120,151 @@ pre {
   </div>
 </div>
 
-<div class="hint">SPACE : replay</div>
 
 <script>
 /* ===== Noise ===== */
+// ===== Config =====
+// backgroundMode:
+//  - "digitalRain" : option #1 (slow matrix-like rain, clearer)
+//  - "noiseFade"   : current option #3 (random noise that fades after skull/logo)
+let backgroundMode = "digitalRain";
+
+// Visual effects
+let enableSuckIn = false; // dark vignette that ramps up when skull decoding starts
+
+// iPhone / mobile perf hints
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+const DPR_CAP = isMobile ? 1.5 : 2;
+let dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
+let lastFrame = 0;
+const TARGET_DT = isMobile ? 33 : 16; // ~30fps mobile, ~60fps desktop
+
 const canvas = document.getElementById("noise");
 const ctx = canvas.getContext("2d");
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
 const fontSize = 16;
 let cols, rows, grid = [];
 
+// noise intensity controls (option #3: fade out over time)
+let noiseTextAlpha = 0.22;      // how bright characters are
+let noiseTrailAlpha = 0.35;     // how much the previous frame remains (lower = longer trails)
+let noiseTargetTextAlpha = noiseTextAlpha;
+let noiseTargetTrailAlpha = noiseTrailAlpha;
+
+// option #1 digital rain state
+let dropsY = [];
+let dropsSpeed = [];
+let dropsChar = [];
+
+// suck-in effect state
+let suck = 0;          // 0..1 intensity
+let suckTarget = 0;
+
 function resize(){
-  canvas.width = innerWidth;
-  canvas.height = innerHeight;
-  cols = Math.ceil(canvas.width / fontSize);
-  rows = Math.ceil(canvas.height / fontSize);
+  dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
+  canvas.width = Math.floor(innerWidth * dpr);
+  canvas.height = Math.floor(innerHeight * dpr);
+  canvas.style.width = innerWidth + "px";
+  canvas.style.height = innerHeight + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  cols = Math.ceil(innerWidth / fontSize);
+  rows = Math.ceil(innerHeight / fontSize);
   grid = new Array(cols * rows).fill("");
+
+  // digital rain state
+  dropsY = new Array(cols).fill(0);
+  dropsSpeed = new Array(cols).fill(0).map(() => 0.2 + Math.random() * 0.6);
+  dropsChar = new Array(cols).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]);
+
   ctx.font = fontSize + "px monospace";
 }
-window.addEventListener("resize", resize);
 
-function drawNoise(){
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "#2a2a2a";
-  for(let i=0;i<grid.length;i++){
-    if(Math.random()>0.94){
-      grid[i] = chars[Math.floor(Math.random()*chars.length)];
+function drawNoise(now = performance.now()){
+  // Simple frame throttling for mobile
+  if (now - lastFrame < TARGET_DT) {
+    requestAnimationFrame(drawNoise);
+    return;
+  }
+  lastFrame = now;
+
+  // Smoothly approach suck target
+  suck += (suckTarget - suck) * 0.025;
+
+  if (backgroundMode === "digitalRain") {
+    // Slight fade to keep trails (gives motion without heavy redraw cost)
+    ctx.fillStyle = `rgba(0,0,0,${0.18 + 0.25 * suck})`;
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+    // characters
+    const alpha = 0.14 + 0.10 * (1 - suck); // visible initially, dim when sucking in
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.font = fontSize + "px monospace";
+
+    for (let c = 0; c < cols; c++) {
+      // occasionally change the column character
+      if (Math.random() > 0.92) dropsChar[c] = chars[Math.floor(Math.random() * chars.length)];
+
+      const x = c * fontSize;
+      const y = dropsY[c] * fontSize;
+      ctx.fillText(dropsChar[c], x, y);
+
+      // move down slowly
+      dropsY[c] += dropsSpeed[c];
+
+      // reset occasionally after it passes bottom
+      if (y > innerHeight + fontSize * 2 && Math.random() > 0.97) {
+        dropsY[c] = 0;
+        dropsSpeed[c] = 0.2 + Math.random() * 0.6;
+      }
     }
-    if(grid[i]){
-      const x = (i%cols)*fontSize;
-      const y = Math.floor(i/cols)*fontSize + fontSize;
-      ctx.fillText(grid[i], x, y);
+
+  } else {
+    // ===== noiseFade (option #3) =====
+    ctx.fillStyle = `rgba(0,0,0,${noiseTrailAlpha})`;
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+    noiseTextAlpha += (noiseTargetTextAlpha - noiseTextAlpha) * 0.02;
+    noiseTrailAlpha += (noiseTargetTrailAlpha - noiseTrailAlpha) * 0.02;
+
+    // slightly dimmer when sucking in
+    const a = Math.max(0, noiseTextAlpha * (1 - 0.65 * suck));
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.font = fontSize + "px monospace";
+
+    // lower draw cost on mobile by skipping some cells
+    const step = isMobile ? 2 : 1;
+    for(let i = 0; i < grid.length; i += step){
+      if(Math.random() > 0.90){
+        grid[i] = chars[Math.floor(Math.random() * chars.length)];
+      }
+      const ch = grid[i];
+      if(ch){
+        const x = (i % cols) * fontSize;
+        const y = Math.floor(i / cols) * fontSize + fontSize;
+        ctx.fillText(ch, x, y);
+        if(Math.random() > 0.985) grid[i] = "";
+      }
     }
   }
+
+  // Optional suck-in vignette (dark radial gradient centered on the art)
+  if (enableSuckIn && suck > 0.01) {
+    const rect = art.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const r0 = Math.max(rect.width, rect.height) * (0.35 + 0.15 * (1 - suck));
+    const r1 = Math.max(innerWidth, innerHeight) * (0.65 + 0.25 * suck);
+
+    const g = ctx.createRadialGradient(cx, cy, r0, cx, cy, r1);
+    g.addColorStop(0, `rgba(0,0,0,${0.00 + 0.18 * suck})`);
+    g.addColorStop(1, `rgba(0,0,0,${0.25 + 0.55 * suck})`);
+
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, innerWidth, innerHeight);
+  }
+
   requestAnimationFrame(drawNoise);
 }
 
@@ -247,17 +350,48 @@ async function play(){
   // reserve logo height/position immediately so it doesn't pop in
   logoSpan.textContent  = reserveBlock(LOGO);
 
+  // Background behavior
+  if (backgroundMode === "noiseFade") {
+    noiseTargetTextAlpha = 0.22;
+    noiseTargetTrailAlpha = 0.35;
+  }
+
+  // reset suck-in
+  suck = 0;
+  suckTarget = 0;
+
   // stop visuals
   skullSpan.classList.remove("glitch","burst");
   logoSpan.classList.remove("glitch","burst");
   if (glitchTimer) clearInterval(glitchTimer);
   glitchTimer = null;
 
+  // start “suck-in” as the skull begins decoding
+  if (enableSuckIn) suckTarget = 1;
+
   // 1) decode skull (top -> bottom)
   await scramble(skullSpan, SKULL, 22, 55);
 
+  // After skull is clear, start fading the background (only in noiseFade mode)
+  if (backgroundMode === "noiseFade") {
+    noiseTargetTextAlpha = 0.10;
+    noiseTargetTrailAlpha = 0.55;
+  }
+
+  // reduce suck slightly so it doesn't feel too dark
+  if (enableSuckIn) suckTarget = 0.65;
+
   // 2) then decode logo (top -> bottom)
   await scramble(logoSpan, LOGO, 18, 55);
+
+  // After logo is clear, fade further (only in noiseFade mode)
+  if (backgroundMode === "noiseFade") {
+    noiseTargetTextAlpha = 0.04;
+    noiseTargetTrailAlpha = 0.70;
+  }
+
+  // relax suck-in after the full reveal
+  if (enableSuckIn) suckTarget = 0.25;
 
   // 3) glitch: skull moves, logo flickers/glows only
   skullSpan.classList.add("glitch");
@@ -278,6 +412,8 @@ async function play(){
 window.addEventListener("keydown",e=>{
   if(e.code==="Space") play();
 });
+// iPhone: tap to replay
+window.addEventListener("touchstart", () => play(), { passive: true });
 
 /* ===== Boot ===== */
 resize();
