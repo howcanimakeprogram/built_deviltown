@@ -139,6 +139,12 @@ let dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
 let lastFrame = 0;
 const TARGET_DT = isMobile ? 33 : 16; // ~30fps mobile, ~60fps desktop
 
+// Digital-rain visibility controls (start strong, then fade to subtle)
+let rainTextAlpha = 0.32;        // current alpha
+let rainTargetTextAlpha = 0.18;  // target alpha
+let rainClearAlpha = 0.10;       // how much we darken each frame (lower = stronger trails)
+let rainTargetClearAlpha = 0.18; // target clear alpha
+
 const canvas = document.getElementById("noise");
 const ctx = canvas.getContext("2d");
 const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
@@ -174,7 +180,7 @@ function resize(){
 
   // digital rain state
   dropsY = new Array(cols).fill(0);
-  dropsSpeed = new Array(cols).fill(0).map(() => 0.2 + Math.random() * 0.6);
+  dropsSpeed = new Array(cols).fill(0).map(() => 0.45 + Math.random() * 1.2);
   dropsChar = new Array(cols).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]);
 
   ctx.font = fontSize + "px monospace";
@@ -193,11 +199,14 @@ function drawNoise(now = performance.now()){
 
   if (backgroundMode === "digitalRain") {
     // Slight fade to keep trails (gives motion without heavy redraw cost)
-    ctx.fillStyle = `rgba(0,0,0,${0.18 + 0.25 * suck})`;
+    ctx.fillStyle = `rgba(0,0,0,${rainClearAlpha + 0.25 * suck})`;
     ctx.fillRect(0, 0, innerWidth, innerHeight);
 
-    // characters
-    const alpha = 0.14 + 0.10 * (1 - suck); // visible initially, dim when sucking in
+    // Smoothly approach rain targets
+    rainTextAlpha += (rainTargetTextAlpha - rainTextAlpha) * 0.02;
+    rainClearAlpha += (rainTargetClearAlpha - rainClearAlpha) * 0.02;
+
+    const alpha = Math.max(0, rainTextAlpha * (1 - 0.65 * suck));
     ctx.fillStyle = `rgba(255,255,255,${alpha})`;
     ctx.font = fontSize + "px monospace";
 
@@ -418,7 +427,25 @@ window.addEventListener("touchstart", () => play(), { passive: true });
 /* ===== Boot ===== */
 resize();
 drawNoise();
-setTimeout(play,500);
+
+// Start with strong rain for a couple seconds, then fade down and start the skull
+if (backgroundMode === "digitalRain") {
+  rainTextAlpha = 0.34;
+  rainTargetTextAlpha = 0.34;
+  rainClearAlpha = 0.08;
+  rainTargetClearAlpha = 0.08;
+}
+
+setTimeout(() => {
+  // Begin fading the rain toward the subtle baseline
+  if (backgroundMode === "digitalRain") {
+    rainTargetTextAlpha = 0.18;
+    rainTargetClearAlpha = 0.18;
+  }
+
+  // Start the skull decode while the background fades
+  play();
+}, 2500);
 </script>
 
 </body>
