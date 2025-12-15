@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEVILTOWN</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+/* ===== Noise background ===== */
+#noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.45;
+}
+
+/* ===== Center stage ===== */
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#art {
+  text-align: center;
+  padding: 24px 30px;
+  background: rgba(0,0,0,0.15);
+  box-shadow: 0 0 80px 50px rgba(0,0,0,0.6);
+}
+
+/* ===== ASCII ===== */
+pre {
+  margin: 0;
+  white-space: pre;
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255,255,255,0.35),
+    0 0 18px rgba(255,255,255,0.2);
+}
+
+#ascii {
+  font-size: clamp(10px, 1.15vw, 16px);
+  line-height: 1.02;
+  font-weight: 800;
+}
+#skullSpan{ display:block; font-size: 1em; }
+#logoSpan{ display:block; font-size: 0.70em; margin-top: 12px; }
+
+#skullSpan.glitch{
+  animation: nudge 4.2s steps(6,end) infinite;
+  filter: brightness(1.1) contrast(1.2);
+}
+
+#skullSpan.burst{
+  text-shadow:
+    -4px 0 rgba(255,255,255,0.55),
+     4px 0 rgba(255,255,255,0.35),
+     0 0 24px rgba(255,255,255,0.6),
+     0 0 64px rgba(255,255,255,0.3);
+}
+
+@keyframes nudge {
+  0% { transform: translate(0,0); }
+  6% { transform: translate(-3px,1px); }
+  12% { transform: translate(4px,-2px); }
+  18% { transform: translate(-5px,0); }
+  24% { transform: translate(3px,2px); }
+  30% { transform: translate(0,-3px); }
+  60% { transform: translate(0,0); }
+  72% { transform: translate(-4px,2px); }
+  84% { transform: translate(5px,-2px); }
+  100% { transform: translate(0,0); }
+}
+
+@keyframes logoFlicker{
+  0%, 100%{ opacity: 1; }
+  45%{ opacity: 0.92; }
+  46%{ opacity: 1; }
+  78%{ opacity: 0.95; }
+  79%{ opacity: 1; }
+}
+
+#logoSpan.glitch{
+  animation: logoFlicker 1.9s steps(2,end) infinite;
+  filter: brightness(1.05) contrast(1.15);
+}
+
+#logoSpan.burst{
+  text-shadow:
+    -4px 0 rgba(255,255,255,0.55),
+     4px 0 rgba(255,255,255,0.35),
+     0 0 24px rgba(255,255,255,0.6),
+     0 0 64px rgba(255,255,255,0.3);
+}
+
+.hint {
+  position: fixed;
+  bottom: 12px;
+  left: 14px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  z-index: 20;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="noise"></canvas>
+
+<div class="stage">
+  <div id="art">
+    <pre id="ascii"><span id="skullSpan"></span><span id="logoSpan"></span></pre>
+  </div>
+</div>
+
+<div class="hint">SPACE : replay</div>
+
+<script>
+/* ===== Noise ===== */
+const canvas = document.getElementById("noise");
+const ctx = canvas.getContext("2d");
+const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+const fontSize = 16;
+let cols, rows, grid = [];
+
+function resize(){
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  cols = Math.ceil(canvas.width / fontSize);
+  rows = Math.ceil(canvas.height / fontSize);
+  grid = new Array(cols * rows).fill("");
+  ctx.font = fontSize + "px monospace";
+}
+window.addEventListener("resize", resize);
+
+function drawNoise(){
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#2a2a2a";
+  for(let i=0;i<grid.length;i++){
+    if(Math.random()>0.94){
+      grid[i] = chars[Math.floor(Math.random()*chars.length)];
+    }
+    if(grid[i]){
+      const x = (i%cols)*fontSize;
+      const y = Math.floor(i/cols)*fontSize + fontSize;
+      ctx.fillText(grid[i], x, y);
+    }
+  }
+  requestAnimationFrame(drawNoise);
+}
+
+/* ===== ASCII DATA ===== */
+const SKULL = `
+ @@@@@                                        @@@@@
+@@@@@@@                                      @@@@@@@
+@@@@@@@           @@@@@@@@@@@@@@@            @@@@@@@
+ @@@@@@@@       @@@@@@@@@@@@@@@@@@@        @@@@@@@@
+     @@@@@     @@@@@@@@@@@@@@@@@@@@@     @@@@@
+       @@@@@  @@@@@@@@@@@@@@@@@@@@@@@  @@@@@
+         @@  @@@@@@@@@@@@@@@@@@@@@@@@@  @@
+            @@@@@@@    @@@@@@    @@@@@@
+            @@@@@@      @@@@      @@@@@
+            @@@@@@      @@@@      @@@@@
+             @@@@@@    @@@@@@    @@@@@
+              @@@@@@@@@@@  @@@@@@@@@@
+               @@@@@@@@@@  @@@@@@@@@
+           @@   @@@@@@@@@@@@@@@@@   @@
+           @@@@  @@@@ @ @ @ @ @@@@  @@@@
+          @@@@@   @@@ @ @ @ @ @@@   @@@@@
+        @@@@@      @@@@@@@@@@@@@      @@@@@
+      @@@@          @@@@@@@@@@@          @@@@
+   @@@@@              @@@@@@@              @@@@@
+  @@@@@@@                                 @@@@@@@
+   @@@@@                                   @@@@@
+`;
+
+const LOGO = `
+██████╗ ███████╗██╗   ██╗██╗██╗  ████████╗ ██████╗ ██╗    ██╗███╗   ██╗
+██╔══██╗██╔════╝██║   ██║██║██║  ╚══██╔══╝██╔═══██╗██║    ██║████╗  ██║
+██║  ██║█████╗  ██║   ██║██║██║     ██║   ██║   ██║██║ █╗ ██║██╔██╗ ██║
+██║  ██║██╔══╝  ╚██╗ ██╔╝██║██║     ██║   ██║   ██║██║███╗██║██║╚██╗██║
+██████╔╝███████╗ ╚████╔╝ ██║███████╗██║   ╚██████╔╝╚███╔███╔╝██║ ╚████║
+╚═════╝ ╚══════╝  ╚═══╝  ╚═╝╚══════╝╚═╝    ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═══╝
+`;
+
+/* ===== Scramble ===== */
+const decode = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*░▒▓█";
+function reserveBlock(text){
+  // Keep line breaks and spaces so the layout is reserved without showing glyphs
+  return text.split("\n").map(line => line.replace(/[^\s]/g, " ")).join("\n");
+}
+function scramble(el, text, speed=22, steps=50){
+  const lines = text.split("\n");
+  const totalLines = lines.length;
+  let revealed = 0;
+
+  return new Promise(res => {
+    const it = setInterval(() => {
+      const out = lines.map((line, li) => {
+        if (li < revealed) return line;
+        if (line.length === 0) return "";
+
+        return line.split("").map(ch => {
+          // keep spaces so the silhouette feels stable while decoding
+          if (ch === " ") return " ";
+          return decode[Math.floor(Math.random() * decode.length)];
+        }).join("");
+      }).join("\n");
+
+      el.textContent = out;
+
+      revealed += totalLines / steps;
+      if (revealed >= totalLines) {
+        clearInterval(it);
+        el.textContent = text;
+        res();
+      }
+    }, speed);
+  });
+}
+
+/* ===== Sequence ===== */
+const art = document.getElementById("art");
+const skullSpan = document.getElementById("skullSpan");
+const logoSpan  = document.getElementById("logoSpan");
+
+let glitchTimer = null;
+
+async function play(){
+  skullSpan.textContent = "";
+  // reserve logo height/position immediately so it doesn't pop in
+  logoSpan.textContent  = reserveBlock(LOGO);
+
+  // stop visuals
+  skullSpan.classList.remove("glitch","burst");
+  logoSpan.classList.remove("glitch","burst");
+  if (glitchTimer) clearInterval(glitchTimer);
+  glitchTimer = null;
+
+  // 1) decode skull (top -> bottom)
+  await scramble(skullSpan, SKULL, 22, 55);
+
+  // 2) then decode logo (top -> bottom)
+  await scramble(logoSpan, LOGO, 18, 55);
+
+  // 3) glitch: skull moves, logo flickers/glows only
+  skullSpan.classList.add("glitch");
+  logoSpan.classList.add("glitch");
+
+  glitchTimer = setInterval(() => {
+    if (Math.random() < 0.22) {
+      skullSpan.classList.add("burst");
+      logoSpan.classList.add("burst");
+      setTimeout(() => {
+        skullSpan.classList.remove("burst");
+        logoSpan.classList.remove("burst");
+      }, 140);
+    }
+  }, 360);
+}
+
+window.addEventListener("keydown",e=>{
+  if(e.code==="Space") play();
+});
+
+/* ===== Boot ===== */
+resize();
+drawNoise();
+setTimeout(play,500);
+</script>
+
+</body>
+</html>
