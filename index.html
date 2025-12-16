@@ -268,12 +268,8 @@ body.page-open #content{
 }
 
 /* content sections */
-.section{
-  display: none;
-}
-.section.active{
-  display: block;
-}
+.section{ display: none; }
+.section.active{ display: block; }
 
 .section h2{
   margin: 0 0 10px;
@@ -357,6 +353,81 @@ body.page-open #content{
   font-size: 12px;
   opacity: 0.8;
 }
+
+/* ===== Playlist (Modal) helpers ===== */
+.playlist-open{
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ===== Video Modal ===== */
+#videoModal{
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+}
+body.video-open #videoModal{
+  display: block;
+}
+.video-modal-bg{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(3px);
+}
+.video-modal-panel{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(980px, calc(100vw - 24px));
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 0 90px rgba(0,0,0,0.65);
+  overflow: hidden;
+}
+.video-modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.video-modal-title{
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-size: 13px;
+  opacity: 0.95;
+}
+.video-modal-close{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.18);
+  color:#fff;
+  font: inherit;
+  padding: 6px 10px;
+  cursor:pointer;
+}
+.video-modal-body{
+  padding: 12px;
+}
+.video-frame{
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(0,0,0,0.4);
+}
+@media (max-width: 760px){
+  .video-modal-panel{ width: calc(100vw - 16px); }
+  .video-modal-body{ padding: 10px; }
+}
 </style>
 </head>
 
@@ -398,6 +469,28 @@ body.page-open #content{
 
 <!-- Page overlay -->
 <div id="pageOverlay" hidden></div>
+
+<!-- Video modal -->
+<div id="videoModal" aria-hidden="true">
+  <div id="videoModalBg" class="video-modal-bg"></div>
+  <div class="video-modal-panel" role="dialog" aria-modal="true" aria-label="Video player">
+    <div class="video-modal-head">
+      <div id="videoModalTitle" class="video-modal-title">Playlist</div>
+      <button id="videoModalClose" class="video-modal-close" aria-label="Close video">✕</button>
+    </div>
+    <div class="video-modal-body">
+      <iframe
+        id="videoModalFrame"
+        class="video-frame"
+        src=""
+        title="YouTube playlist"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+</div>
 
 <!-- Page container (overlay panel) -->
 <section id="content" aria-hidden="true">
@@ -442,35 +535,40 @@ body.page-open #content{
     <div id="sec-archive" class="section">
       <h2>Archive (Photo / Video)</h2>
       <p>포토 / 비디오 아카이브 (비디오는 유튜브 업로드 예정)</p>
+
       <div class="grid" style="margin-top:12px;">
         <div class="card">
           <div class="thumb">PHOTO</div>
           <div class="small" style="margin-top:10px;">2nd anniversary</div>
         </div>
+
         <div class="card">
           <button
             class="playlist-open"
             data-title="2nd anniversary"
             data-playlist="PLD77k4981Xmfssx7kqCfItuIXq6mESenJ">
-        
             <div class="thumb">VIDEO</div>
             <div class="small" style="margin-top:10px;">
               2nd anniversary (playlist) ▶
             </div>
           </button>
         </div>
+
         <div class="card">
           <div class="thumb">DESIGN</div>
           <div class="small" style="margin-top:10px;">Artwork archive</div>
         </div>
+
         <div class="card">
           <div class="thumb">PHOTO</div>
           <div class="small" style="margin-top:10px;">Album placeholder</div>
         </div>
+
         <div class="card">
           <div class="thumb">VIDEO</div>
           <div class="small" style="margin-top:10px;">Playlist placeholder</div>
         </div>
+
         <div class="card">
           <div class="thumb">DESIGN</div>
           <div class="small" style="margin-top:10px;">Archive placeholder</div>
@@ -771,16 +869,13 @@ function openPage(key){
   const sec = sections[key];
   if (!sec) return;
 
-  // show overlay + panel
   document.body.classList.add("page-open");
   pageOverlay.hidden = false;
   content.setAttribute("aria-hidden","false");
 
-  // activate section
   Object.values(sections).forEach(s => s.classList.remove("active"));
   sec.classList.add("active");
 
-  // title
   const titleMap = {
     wtfis: "whatthefuckisdeviltown",
     schedule: "Schedule",
@@ -790,14 +885,36 @@ function openPage(key){
   };
   contentTitle.textContent = titleMap[key] || "DEVILTOWN";
 
-  // prevent background scroll (stay at intro)
   document.documentElement.style.overflow = "hidden";
   document.body.style.overflow = "hidden";
 
   closeMenu();
 }
 
+/* ===== Video Modal logic ===== */
+const videoModal = document.getElementById("videoModal");
+const videoModalBg = document.getElementById("videoModalBg");
+const videoModalClose = document.getElementById("videoModalClose");
+const videoModalTitle = document.getElementById("videoModalTitle");
+const videoModalFrame = document.getElementById("videoModalFrame");
+
+function openVideoModal(title, playlistId){
+  videoModalTitle.textContent = title || "Playlist";
+  videoModalFrame.src = `https://www.youtube.com/embed/videoseries?list=${playlistId}&rel=0&modestbranding=1`;
+  document.body.classList.add("video-open");
+  videoModal.setAttribute("aria-hidden","false");
+}
+function closeVideoModal(){
+  document.body.classList.remove("video-open");
+  videoModal.setAttribute("aria-hidden","true");
+  videoModalFrame.src = ""; // stop playback
+}
+
+videoModalClose.addEventListener("click", closeVideoModal);
+videoModalBg.addEventListener("click", closeVideoModal);
+
 function closePage(){
+  if (document.body.classList.contains("video-open")) closeVideoModal();
   document.body.classList.remove("page-open");
   pageOverlay.hidden = true;
   content.setAttribute("aria-hidden","true");
@@ -813,9 +930,20 @@ menuItems.forEach(btn => {
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    if (document.body.classList.contains("video-open")) closeVideoModal();
     closeMenu();
     closePage();
   }
+});
+
+// bind playlist cards -> modal
+document.querySelectorAll(".playlist-open").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const title = btn.getAttribute("data-title") || "Playlist";
+    const pid   = btn.getAttribute("data-playlist");
+    openPage("archive");
+    openVideoModal(title, pid);
+  });
 });
 
 /* ===== Glitch burst ===== */
@@ -834,7 +962,6 @@ async function play(){
   await scramble(skullSpan, SKULL, 22, 55);
   await scramble(logoSpan, LOGO, 18, 55);
 
-  // intro finished
   enableMenu();
 
   skullSpan.classList.add("glitch");
