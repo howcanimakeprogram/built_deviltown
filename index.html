@@ -13,11 +13,8 @@ html, body {
   background: #000;
   color: #fff;
   font-family: ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+  overflow: hidden; /* 기본: 대문 고정 */
 }
-
-/* 처음엔 인트로만 보이게 스크롤 잠금 */
-body { overflow: hidden; }
-body.intro-done { overflow: auto; }
 
 /* ===== Background canvas ===== */
 #noise {
@@ -38,15 +35,6 @@ body.intro-done { overflow: auto; }
   pointer-events: none;
 }
 
-/* 인트로 끝나면 stage는 위쪽 헤더처럼 남기고, 아래 컨텐츠 스크롤 가능 */
-body.intro-done .stage {
-  position: relative;
-  height: auto;
-  padding: 84px 16px 40px;
-  inset: unset;
-}
-
-/* intro 박스 */
 #art {
   text-align: center;
   padding: 24px 30px;
@@ -204,39 +192,93 @@ body.menu-open .menu-panel{
   border-color: rgba(255,255,255,0.22);
 }
 
-.menu-content{
+.menu-help{
   margin-top: 14px;
   padding-top: 12px;
   border-top: 1px solid rgba(255,255,255,0.10);
-  color: rgba(255,255,255,0.90);
-  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  font-size: 12px;
   line-height: 1.6;
 }
-.menu-content a{ color: #fff; }
 
-/* ===== Main content ===== */
-#content{
-  position: relative;
-  z-index: 5;
-  padding: 0 16px 80px;
-  max-width: 980px;
-  margin: 0 auto;
+/* ===== Page overlay (content) ===== */
+#pageOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 22;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(2px);
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 500ms ease, transform 500ms ease;
-}
-body.intro-done #content{
-  opacity: 1;
-  transform: translateY(0);
+  pointer-events: none;
+  transition: opacity 220ms ease;
 }
 
-.section{
-  padding: 26px 0;
-  border-top: 1px solid rgba(255,255,255,0.10);
+#content{
+  position: fixed;
+  left: 50%;
+  top: 56px;
+  transform: translateX(-50%) translateY(10px);
+  width: min(980px, calc(100vw - 24px));
+  height: min(78vh, 720px);
+  z-index: 23;
+  background: rgba(0,0,0,0.72);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 0 80px rgba(0,0,0,0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+  overflow: hidden;
 }
+
+body.page-open #pageOverlay{
+  opacity: 1;
+  pointer-events: auto;
+}
+body.page-open #content{
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.content-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 12px;
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.10);
+}
+.content-title{
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-size: 14px;
+  opacity: 0.95;
+}
+.content-close{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.18);
+  color:#fff;
+  font: inherit;
+  padding: 6px 10px;
+  cursor:pointer;
+}
+.content-body{
+  height: calc(100% - 49px);
+  overflow: auto;
+  padding: 14px 14px 30px;
+}
+
+/* content sections */
+.section{
+  display: none;
+}
+.section.active{
+  display: block;
+}
+
 .section h2{
   margin: 0 0 10px;
-  font-size: 18px;
+  font-size: 16px;
   letter-spacing: 0.06em;
 }
 .section p{
@@ -262,6 +304,7 @@ body.intro-done #content{
   gap: 12px;
 }
 @media (max-width: 760px){
+  #content{ top: 48px; height: min(82vh, 760px); }
   .grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
 }
 @media (max-width: 420px){
@@ -287,11 +330,6 @@ body.intro-done #content{
   justify-content:center;
   color: rgba(255,255,255,0.8);
   letter-spacing: 0.08em;
-}
-.meta{
-  margin-top: 10px;
-  font-size: 13px;
-  color: rgba(255,255,255,0.85);
 }
 
 /* Marathoner cards */
@@ -347,122 +385,160 @@ body.intro-done #content{
   <nav class="menu-items">
     <button class="menu-item" data-key="wtfis">whatthefuckisdeviltown</button>
     <button class="menu-item" data-key="schedule">Schedule</button>
-    <button class="menu-item" data-key="archive">Archive</button>
+    <button class="menu-item" data-key="archive">Archive (Photo/Video)</button>
     <button class="menu-item" data-key="mixes">Mixes</button>
     <button class="menu-item" data-key="marathoner">Marathoner</button>
   </nav>
 
-  <div id="menuContent" class="menu-content"></div>
+  <div class="menu-help">
+    click item → open page<br/>
+    ESC → close<br/>
+    SPACE / tap → replay intro
+  </div>
 </aside>
 
-<!-- Main content (scroll target sections) -->
-<main id="content">
-  <section id="wtfis" class="section">
-    <h2>whatthefuckisdeviltown</h2>
-    <p>러닝 / 음악 / 디자인 / 기록을 모아두는 개인 아카이브. (꾸준히 업데이트)</p>
-    <p class="small">로고, 도안 파일, 그래픽 실험, 그리고 프로젝트 흔적들을 올릴 예정.</p>
-  </section>
+<!-- Page overlay -->
+<div id="pageOverlay" hidden></div>
 
-  <section id="schedule" class="section">
-    <h2>Schedule</h2>
-    <p>레이스 / 트래블 / 이벤트 공유 캘린더</p>
-    <a class="btn" href="webcal://p44-caldav.icloud.com/published/2/NDE4ODE1NjY2NDE4ODE1NqDjLwq8GMN_zupBHSe0DAmmz8VvM5LEnkcLBL298CvgpMqp9UnWVYdyl0KkEr3T51GFC-uIzKH_pnozZxt_HFc">
-      📅 iCloud Calendar 구독하기
-    </a>
-    <p class="small" style="margin-top:10px;">
-      webcal://p44-caldav.icloud.com/published/2/NDE4ODE1NjY2NDE4ODE1NqDjLwq8GMN_zupBHSe0DAmmz8VvM5LEnkcLBL298CvgpMqp9UnWVYdyl0KkEr3T51GFC-uIzKH_pnozZxt_HFc
-    </p>
-  </section>
+<!-- Page container (overlay panel) -->
+<section id="content" aria-hidden="true">
+  <div class="content-header">
+    <div id="contentTitle" class="content-title">DEVILTOWN</div>
+    <button id="pageClose" class="content-close" aria-label="Close page">✕</button>
+  </div>
 
-  <section id="archive" class="section">
-    <h2>Archive</h2>
-    <p>포토 / 비디오 아카이브 (비디오는 유튜브 업로드 예정)</p>
-
-    <div class="grid">
-      <div class="card">
-        <div class="thumb">PHOTO</div>
-        <div class="meta">Travel / Running / Daily snaps</div>
-      </div>
-      <div class="card">
-        <div class="thumb">VIDEO</div>
-        <div class="meta">YouTube uploads & edits</div>
-      </div>
-      <div class="card">
-        <div class="thumb">DESIGN</div>
-        <div class="meta">posters / tees / logos</div>
-      </div>
-      <div class="card">
-        <div class="thumb">PHOTO</div>
-        <div class="meta">Album placeholder</div>
-      </div>
-      <div class="card">
-        <div class="thumb">VIDEO</div>
-        <div class="meta">Playlist placeholder</div>
-      </div>
-      <div class="card">
-        <div class="thumb">DESIGN</div>
-        <div class="meta">Archive placeholder</div>
+  <div class="content-body">
+    <div id="sec-wtfis" class="section">
+      <h2>whatthefuckisdeviltown</h2>
+      <p>로고 / 디자인 파일 / 도안 / 그래픽 실험 / 비주얼 작업 아카이브.</p>
+      <p class="small">폴더 구조나 파일 링크는 추후 여기에 계속 추가.</p>
+      <div class="grid" style="margin-top:12px;">
+        <div class="card">
+          <div class="thumb">LOGO</div>
+          <div class="small" style="margin-top:10px;">DEVILTOWN logo set</div>
+        </div>
+        <div class="card">
+          <div class="thumb">TEES</div>
+          <div class="small" style="margin-top:10px;">T-shirt graphics</div>
+        </div>
+        <div class="card">
+          <div class="thumb">POSTER</div>
+          <div class="small" style="margin-top:10px;">Posters / Flyers</div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <section id="mixes" class="section">
-    <h2>Mixes</h2>
-    <p>믹스셋 업로드 방식 확정되면 여기에 바로 연결.</p>
-    <p class="small">Mixcloud / hearthis.at / 직접 호스팅 등 후보 검토 중.</p>
-  </section>
+    <div id="sec-schedule" class="section">
+      <h2>Schedule</h2>
+      <p>레이스 / 트래블 / 이벤트 공유 캘린더</p>
+      <a class="btn" href="webcal://p44-caldav.icloud.com/published/2/NDE4ODE1NjY2NDE4ODE1NqDjLwq8GMN_zupBHSe0DAmmz8VvM5LEnkcLBL298CvgpMqp9UnWVYdyl0KkEr3T51GFC-uIzKH_pnozZxt_HFc">
+        📅 iCloud Calendar 구독하기
+      </a>
+      <p class="small" style="margin-top:10px; word-break: break-all;">
+        webcal://p44-caldav.icloud.com/published/2/NDE4ODE1NjY2NDE4ODE1NqDjLwq8GMN_zupBHSe0DAmmz8VvM5LEnkcLBL298CvgpMqp9UnWVYdyl0KkEr3T51GFC-uIzKH_pnozZxt_HFc
+      </p>
+      <p class="small">※ 브라우저에 따라 webcal 링크는 “캘린더 앱 열기/구독”으로 동작.</p>
+    </div>
 
-  <section id="marathoner" class="section">
-    <h2>Marathoner</h2>
-    <p>러닝 기록 + 사진 + 이력 (일단 사진은 아스키 해골로 대체)</p>
-
-    <div class="run-grid">
-      <div class="card">
-        <div class="meta"><b>Race #1</b> · 42.195K · 00:00:00</div>
-        <div class="small">YYYY-MM-DD · Location</div>
-        <div class="run-photo"><pre id="runSkull1"></pre></div>
-      </div>
-
-      <div class="card">
-        <div class="meta"><b>Race #2</b> · 21.1K · 00:00:00</div>
-        <div class="small">YYYY-MM-DD · Location</div>
-        <div class="run-photo"><pre id="runSkull2"></pre></div>
-      </div>
-
-      <div class="card">
-        <div class="meta"><b>Race #3</b> · 10K · 00:00:00</div>
-        <div class="small">YYYY-MM-DD · Location</div>
-        <div class="run-photo"><pre id="runSkull3"></pre></div>
-      </div>
-
-      <div class="card">
-        <div class="meta"><b>Race #4</b> · Trail · 00:00:00</div>
-        <div class="small">YYYY-MM-DD · Location</div>
-        <div class="run-photo"><pre id="runSkull4"></pre></div>
+    <div id="sec-archive" class="section">
+      <h2>Archive (Photo / Video)</h2>
+      <p>포토 / 비디오 아카이브 (비디오는 유튜브 업로드 예정)</p>
+      <div class="grid" style="margin-top:12px;">
+        <div class="card">
+          <div class="thumb">PHOTO</div>
+          <div class="small" style="margin-top:10px;">Travel / Running / Daily snaps</div>
+        </div>
+        <div class="card">
+          <div class="thumb">VIDEO</div>
+          <div class="small" style="margin-top:10px;">YouTube uploads & edits</div>
+        </div>
+        <div class="card">
+          <div class="thumb">DESIGN</div>
+          <div class="small" style="margin-top:10px;">Artwork archive</div>
+        </div>
+        <div class="card">
+          <div class="thumb">PHOTO</div>
+          <div class="small" style="margin-top:10px;">Album placeholder</div>
+        </div>
+        <div class="card">
+          <div class="thumb">VIDEO</div>
+          <div class="small" style="margin-top:10px;">Playlist placeholder</div>
+        </div>
+        <div class="card">
+          <div class="thumb">DESIGN</div>
+          <div class="small" style="margin-top:10px;">Archive placeholder</div>
+        </div>
       </div>
     </div>
-  </section>
 
-</main>
+    <div id="sec-mixes" class="section">
+      <h2>Mixes</h2>
+      <p>믹스셋 업로드 방식 확정되면 여기에 연결.</p>
+      <p class="small">Mixcloud / hearthis.at / 직접 호스팅 등 후보 검토 중.</p>
+      <div class="grid" style="margin-top:12px;">
+        <div class="card">
+          <div class="thumb">MIX #1</div>
+          <div class="small" style="margin-top:10px;">placeholder</div>
+        </div>
+        <div class="card">
+          <div class="thumb">MIX #2</div>
+          <div class="small" style="margin-top:10px;">placeholder</div>
+        </div>
+        <div class="card">
+          <div class="thumb">MIX #3</div>
+          <div class="small" style="margin-top:10px;">placeholder</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sec-marathoner" class="section">
+      <h2>Marathoner</h2>
+      <p>러닝 기록 + 사진 + 이력 (일단 사진은 아스키 해골로 대체)</p>
+
+      <div class="run-grid" style="margin-top:12px;">
+        <div class="card">
+          <div><b>Race #1</b> · 42.195K · 00:00:00</div>
+          <div class="small">YYYY-MM-DD · Location</div>
+          <div class="run-photo"><pre class="runSkull"></pre></div>
+        </div>
+        <div class="card">
+          <div><b>Race #2</b> · 21.1K · 00:00:00</div>
+          <div class="small">YYYY-MM-DD · Location</div>
+          <div class="run-photo"><pre class="runSkull"></pre></div>
+        </div>
+        <div class="card">
+          <div><b>Race #3</b> · 10K · 00:00:00</div>
+          <div class="small">YYYY-MM-DD · Location</div>
+          <div class="run-photo"><pre class="runSkull"></pre></div>
+        </div>
+        <div class="card">
+          <div><b>Race #4</b> · Trail · 00:00:00</div>
+          <div class="small">YYYY-MM-DD · Location</div>
+          <div class="run-photo"><pre class="runSkull"></pre></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
 
 <script>
 /* ===== Noise ===== */
-// Config
 let backgroundMode = "digitalRain"; // "digitalRain" or "noiseFade"
 let enableSuckIn = false;
 
-// iPhone / mobile perf hints
+// iPhone perf
 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 const DPR_CAP = isMobile ? 1.5 : 2;
 let dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
 let lastFrame = 0;
-const TARGET_DT = isMobile ? 33 : 16; // ~30fps mobile, ~60fps desktop
+const TARGET_DT = isMobile ? 33 : 16;
 
-// Digital-rain visibility controls (start strong, then fade to subtle)
-let rainTextAlpha = 0.32;        // current alpha
-let rainTargetTextAlpha = 0.18;  // target alpha
-let rainClearAlpha = 0.10;       // how much we darken each frame (lower = stronger trails)
-let rainTargetClearAlpha = 0.18; // target clear alpha
+// Digital-rain visibility controls (start strong, then fade)
+let rainTextAlpha = 0.32;
+let rainTargetTextAlpha = 0.18;
+let rainClearAlpha = 0.10;
+let rainTargetClearAlpha = 0.18;
 
 const canvas = document.getElementById("noise");
 const ctx = canvas.getContext("2d");
@@ -471,18 +547,15 @@ const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
 const fontSize = 16;
 let cols, rows, grid = [];
 
-// option #3 noise fade controls
 let noiseTextAlpha = 0.22;
 let noiseTrailAlpha = 0.35;
 let noiseTargetTextAlpha = noiseTextAlpha;
 let noiseTargetTrailAlpha = noiseTrailAlpha;
 
-// option #1 digital rain state
 let dropsY = [];
 let dropsSpeed = [];
 let dropsChar = [];
 
-// suck-in state
 let suck = 0;
 let suckTarget = 0;
 
@@ -499,30 +572,25 @@ function resize(){
   grid = new Array(cols * rows).fill("");
 
   dropsY = new Array(cols).fill(0);
-  // speed (빠르게)
-  dropsSpeed = new Array(cols).fill(0).map(() => 0.45 + Math.random() * 1.2);
+  dropsSpeed = new Array(cols).fill(0).map(() => 0.45 + Math.random() * 1.2); // speed up
   dropsChar = new Array(cols).fill(0).map(() => chars[Math.floor(Math.random() * chars.length)]);
 
   ctx.font = fontSize + "px monospace";
 }
 
 function drawNoise(now = performance.now()){
-  // frame throttling for mobile
   if (now - lastFrame < TARGET_DT) {
     requestAnimationFrame(drawNoise);
     return;
   }
   lastFrame = now;
 
-  // suck approach
   suck += (suckTarget - suck) * 0.025;
 
   if (backgroundMode === "digitalRain") {
-    // clear with trails
     ctx.fillStyle = `rgba(0,0,0,${rainClearAlpha + 0.25 * suck})`;
     ctx.fillRect(0, 0, innerWidth, innerHeight);
 
-    // smooth fade toward target
     rainTextAlpha += (rainTargetTextAlpha - rainTextAlpha) * 0.02;
     rainClearAlpha += (rainTargetClearAlpha - rainClearAlpha) * 0.02;
 
@@ -544,7 +612,6 @@ function drawNoise(now = performance.now()){
       }
     }
   } else {
-    // noiseFade (option #3)
     ctx.fillStyle = `rgba(0,0,0,${noiseTrailAlpha})`;
     ctx.fillRect(0, 0, innerWidth, innerHeight);
 
@@ -609,11 +676,9 @@ const LOGO = `
 
 /* ===== Scramble ===== */
 const decode = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*░▒▓█";
-
 function reserveBlock(text){
   return text.split("\n").map(line => line.replace(/[^\s]/g, " ")).join("\n");
 }
-
 function scramble(el, text, speed=22, steps=50){
   const lines = text.split("\n");
   const totalLines = lines.length;
@@ -643,7 +708,6 @@ function scramble(el, text, speed=22, steps=50){
 }
 
 /* ===== Elements ===== */
-const art = document.getElementById("art");
 const skullSpan = document.getElementById("skullSpan");
 const logoSpan  = document.getElementById("logoSpan");
 
@@ -652,56 +716,9 @@ const menuBtn = document.getElementById('menuBtn');
 const menuOverlay = document.getElementById('menuOverlay');
 const menuPanel = document.getElementById('menuPanel');
 const menuClose = document.getElementById('menuClose');
-const menuContent = document.getElementById('menuContent');
 const menuItems = [...document.querySelectorAll('.menu-item')];
 
 let menuEnabled = false;
-
-const MENU = {
-  wtfis: {
-    title: "whatthefuckisdeviltown",
-    desc: "logo / design files",
-    target: "#wtfis"
-  },
-  schedule: {
-    title: "Schedule",
-    desc: "iCloud calendar",
-    target: "#schedule"
-  },
-  archive: {
-    title: "Archive",
-    desc: "photo / video",
-    target: "#archive"
-  },
-  mixes: {
-    title: "Mixes",
-    desc: "sets & mixes",
-    target: "#mixes"
-  },
-  marathoner: {
-    title: "Marathoner",
-    desc: "race history",
-    target: "#marathoner"
-  }
-};
-
-function setMenu(key){
-  menuItems.forEach(b => b.classList.toggle('active', b.dataset.key === key));
-  const item = MENU[key] || MENU.wtfis;
-  menuContent.innerHTML = `
-    <div style="opacity:.85; margin-bottom:10px;">
-      <b>${item.title}</b><br/>
-      <span style="opacity:.8;">${item.desc}</span>
-    </div>
-    <button class="btn" id="goBtn">Go</button>
-  `;
-
-  const goBtn = document.getElementById("goBtn");
-  goBtn.addEventListener("click", () => {
-    closeMenu();
-    scrollToSection(item.target);
-  });
-}
 
 function openMenu(key='wtfis'){
   if (!menuEnabled) return;
@@ -709,16 +726,14 @@ function openMenu(key='wtfis'){
   menuOverlay.hidden = false;
   menuPanel.setAttribute('aria-hidden','false');
   menuBtn.setAttribute('aria-expanded','true');
-  setMenu(key);
+  menuItems.forEach(b => b.classList.toggle('active', b.dataset.key === key));
 }
-
 function closeMenu(){
   document.body.classList.remove('menu-open');
   menuOverlay.hidden = true;
   menuPanel.setAttribute('aria-hidden','true');
   menuBtn.setAttribute('aria-expanded','false');
 }
-
 function enableMenu(){
   if (menuEnabled) return;
   menuEnabled = true;
@@ -732,51 +747,89 @@ menuBtn.addEventListener('click', () => {
 menuClose.addEventListener('click', closeMenu);
 menuOverlay.addEventListener('click', closeMenu);
 
+/* ===== Page overlay logic ===== */
+const pageOverlay = document.getElementById("pageOverlay");
+const content = document.getElementById("content");
+const contentTitle = document.getElementById("contentTitle");
+const pageClose = document.getElementById("pageClose");
+const sections = {
+  wtfis: document.getElementById("sec-wtfis"),
+  schedule: document.getElementById("sec-schedule"),
+  archive: document.getElementById("sec-archive"),
+  mixes: document.getElementById("sec-mixes"),
+  marathoner: document.getElementById("sec-marathoner"),
+};
+
+function openPage(key){
+  const sec = sections[key];
+  if (!sec) return;
+
+  // show overlay + panel
+  document.body.classList.add("page-open");
+  pageOverlay.hidden = false;
+  content.setAttribute("aria-hidden","false");
+
+  // activate section
+  Object.values(sections).forEach(s => s.classList.remove("active"));
+  sec.classList.add("active");
+
+  // title
+  const titleMap = {
+    wtfis: "whatthefuckisdeviltown",
+    schedule: "Schedule",
+    archive: "Archive (Photo/Video)",
+    mixes: "Mixes",
+    marathoner: "Marathoner",
+  };
+  contentTitle.textContent = titleMap[key] || "DEVILTOWN";
+
+  // prevent background scroll (stay at intro)
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
+
+  closeMenu();
+}
+
+function closePage(){
+  document.body.classList.remove("page-open");
+  pageOverlay.hidden = true;
+  content.setAttribute("aria-hidden","true");
+  Object.values(sections).forEach(s => s.classList.remove("active"));
+}
+
+pageClose.addEventListener("click", closePage);
+pageOverlay.addEventListener("click", closePage);
+
 menuItems.forEach(btn => {
-  btn.addEventListener('click', () => setMenu(btn.dataset.key));
+  btn.addEventListener('click', () => openPage(btn.dataset.key));
 });
 
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeMenu();
+  if (e.key === 'Escape') {
+    closeMenu();
+    closePage();
+  }
 });
-
-/* ===== Scroll helpers ===== */
-function scrollToSection(selector){
-  const el = document.querySelector(selector);
-  if (!el) return;
-  const y = el.getBoundingClientRect().top + window.scrollY - 70;
-  window.scrollTo({ top: y, behavior: "smooth" });
-}
 
 /* ===== Glitch burst ===== */
 let glitchTimer = null;
 
 /* ===== Sequence ===== */
-function introDone(){
-  document.body.classList.add("intro-done");
-}
-
 async function play(){
   skullSpan.textContent = "";
   logoSpan.textContent  = reserveBlock(LOGO);
 
-  // stop visuals
   skullSpan.classList.remove("glitch","burst");
   logoSpan.classList.remove("glitch","burst");
   if (glitchTimer) clearInterval(glitchTimer);
   glitchTimer = null;
 
-  // 1) decode skull
   await scramble(skullSpan, SKULL, 22, 55);
-
-  // 2) then decode logo
   await scramble(logoSpan, LOGO, 18, 55);
 
-  // intro finished -> show menu + open scroll/content
+  // intro finished
   enableMenu();
-  introDone();
 
-  // 3) glitch: skull moves, logo flickers/glows only
   skullSpan.classList.add("glitch");
   logoSpan.classList.add("glitch");
 
@@ -792,37 +845,31 @@ async function play(){
   }, 360);
 }
 
-// keyboard / mobile replay
+// replay
 window.addEventListener("keydown", e => { if(e.code==="Space") play(); });
 window.addEventListener("touchstart", () => play(), { passive: true });
 
 /* ===== Boot ===== */
 function seedMarathonerSkulls(){
-  const ids = ["runSkull1","runSkull2","runSkull3","runSkull4"];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = SKULL.trim();
+  document.querySelectorAll(".runSkull").forEach(el => {
+    el.textContent = SKULL.trim();
   });
 }
 
 window.addEventListener("resize", resize);
-
 resize();
 drawNoise();
 seedMarathonerSkulls();
 
-// 시작: 레인을 강하게 보여주고, 2.5초 뒤부터 은은하게 페이드 + 인트로 시작
+// start strong rain then fade + intro start
 rainTextAlpha = 0.34;
 rainTargetTextAlpha = 0.34;
 rainClearAlpha = 0.08;
 rainTargetClearAlpha = 0.08;
 
 setTimeout(() => {
-  // 레인을 지금 톤(은은)으로 서서히 내리고
   rainTargetTextAlpha = 0.18;
   rainTargetClearAlpha = 0.18;
-
-  // 동시에 해골/로고 시퀀스 시작
   play();
 }, 2500);
 </script>
