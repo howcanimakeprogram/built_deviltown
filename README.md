@@ -74,11 +74,12 @@ python main.py
 - [`SYSTEM_DOCS.md`](SYSTEM_DOCS.md): 시스템 전체 구조, API 문서, 트러블슈팅
 - [`system_prompt.md`](system_prompt.md): AI 페르소나 및 대화 가이드
 
-## ⚙️ 기술 스택
+## 🛠️ 기술 스택
 
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Backend**: Python 3.8+, FastAPI
-- **AI**: Google Gemini 1.5 Pro
+- **Backend**: Python, FastAPI
+- **AI**: Google Gemini API
+- **Deployment**: Local Server (Mac) + Cloudflare Tunnel
 - **Server**: Uvicorn (ASGI)
 
 ## 🔒 보안

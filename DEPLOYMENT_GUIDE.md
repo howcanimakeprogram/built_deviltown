@@ -219,70 +219,121 @@ Proxy status: Proxied (주황색 구름)
 TTL: Auto
 ```
 
-#### CNAME 레코드 (www 서브도메인)
-```
-Type: CNAME
-Name: www
-Target: @
-Proxy status: Proxied
-TTL: Auto
-```
+# Devil Town 홈 서버 배포 가이드 (MacBook/Mac Mini)
 
-### 2. SSL/TLS 설정
-
-**SSL/TLS** → **Overview**
-- Encryption mode: **Full (strict)** 선택
+## 📋 개요
+이 가이드는 **집에 있는 Mac**을 서버로 사용하여 전 세계에 웹사이트를 배포하는 방법을 설명합니다.
+**Cloudflare Tunnel**을 사용하므로, 복잡한 공유기 설정(포트포워딩)이나 고정 IP가 필요 없습니다.
 
 ---
 
-## 🔐 SSL/HTTPS 설정
+## 🏗️ 아키텍처
+```mermaid
+graph LR
+    User[🌍 사용자] -->|https://welcometodeviltown.com| CF[☁️ Cloudflare]
+    CF -->|암호화된 터널| Mac[💻 내 맥북/미니PC]
+    Mac -->|localhost:8000| App[🐍 Python Server]
+```
 
-### 1. Nginx 설정
+---
+
+## 🚀 1. 준비물
+- 항상 켜둘 수 있는 **Mac** (맥북, 맥미니 등)
+- 도메인 (예: `welcometodeviltown.com`)
+- Cloudflare 계정
+
+---
+
+## 🛠️ 2. 서버 실행 (Python)
+
+서버는 항상 켜져 있어야 합니다. 터미널을 열고 실행하세요.
+
 ```bash
-nano /etc/nginx/sites-available/deviltown
+# 프로젝트 폴더로 이동
+cd "/Users/chaehyeonbyeongsin/Desktop/코딩/데빌타운 웹사이트"
+
+# 서버 실행 (백그라운드 유지 추천)
+python main.py
 ```
 
-내용:
-```nginx
-server {
-    listen 80;
-    server_name welcometodeviltown.com www.welcometodeviltown.com;
+> **팁**: 터미널을 꺼도 실행되게 하려면 `nohup`을 사용하세요.
+> ```bash
+> nohup python main.py > server.log 2>&1 &
+> ```
 
-    # Cloudflare SSL을 위한 리다이렉트
-    return 301 https://$server_name$request_uri;
-}
+---
 
-server {
-    listen 443 ssl http2;
-    server_name welcometodeviltown.com www.welcometodeviltown.com;
+## 🚇 3. 외부 연결 (Cloudflare Tunnel)
 
-    # Cloudflare Origin Certificate
-    ssl_certificate /etc/ssl/cloudflare/cert.pem;
-    ssl_certificate_key /etc/ssl/cloudflare/key.pem;
-
-    # 정적 파일
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # API 엔드포인트
-    location /chat {
-        proxy_pass http://127.0.0.1:8000/chat;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
+### 3-1. 설치
+```bash
+brew install cloudflared
 ```
+
+### 3-2. 로그인 & 터널 생성
+```bash
+# 로그인 (브라우저 인증)
+cloudflared tunnel login
+
+# 터널 생성 (이름: deviltown)
+cloudflared tunnel create deviltown
+```
+
+### 3-3. 설정 파일 생성
+`~/.cloudflared/config.yml` 파일을 생성하고 아래 내용을 붙여넣으세요.
+(단, `credentials-file` 경로는 실제 생성된 JSON 파일 경로로 수정!)
+
+```yaml
+tunnel: deviltown
+credentials-file: /Users/chaehyeonbyeongsin/.cloudflared/[UUID].json
+
+ingress:
+  - hostname: welcometodeviltown.com
+    service: http://localhost:8000
+  - hostname: www.welcometodeviltown.com
+    service: http://localhost:8000
+  - service: http_status:404
+```
+
+### 3-4. 도메인 연결 & 실행
+```bash
+# 도메인 연결 (DNS)
+cloudflared tunnel route dns deviltown welcometodeviltown.com
+cloudflared tunnel route dns deviltown www.welcometodeviltown.com
+
+# 터널 실행
+cloudflared tunnel run deviltown
+```
+
+---
+
+## ⚡ 4. 맥북 절전 방지 (필수!)
+맥북 덮개를 닫거나 잠자기 모드로 들어가면 서버가 끊깁니다.
+1. **설정** > **디스플레이** > **고급** > **"디스플레이가 꺼져도 잠들지 않음"** 켜기
+2. 또는무료 앱 **Amphetamine** 설치 후 "Indefinitely" 실행
+
+---
+
+## 🔄 5. 자동 실행 (재부팅 시)
+맥을 재부팅해도 자동으로 켜지게 하려면 서비스를 등록하세요.
+
+```bash
+cloudflared service install
+launchctl start com.cloudflare.cloudflared
+```
+
+---
+
+## ✅ 체크리스트
+- [ ] `python main.py` 실행 중인가?
+- [ ] `cloudflared tunnel run` 실행 중인가?
+- [ ] 도메인(`welcometodeviltown.com`) 접속 시 잘 열리는가?
+
 
 ### 2. Cloudflare Origin Certificate 생성
 
 1. Cloudflare Dashboard → **SSL/TLS** → **Origin Server**
 2. **Create Certificate** 클릭
-3. **Generate** 클릭
 4. 인증서 복사:
 
 ```bash
