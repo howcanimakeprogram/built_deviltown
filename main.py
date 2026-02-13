@@ -1,10 +1,12 @@
 # Devil Town Running Coach - FastAPI Backend
 # This server provides the /chat endpoint for AI coach interactions
+# and serves the frontend static files
 
 import os
 import uvicorn
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import google.generativeai as genai
@@ -107,8 +109,20 @@ async def chat_endpoint(request: ChatRequest):
         print(f"Error calling Gemini API: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Note: Static files (index.html, css/, js/) are served from root directory
-# No separate static folder needed - integrated with existing Devil Town website
+# Root endpoint - serve index.html
+@app.get("/")
+async def read_root():
+    """Serve the main index.html page"""
+    return FileResponse("index.html")
+
+# Mount static files (CSS, JS, etc.)
+# This allows serving frontend from the same port as backend
+app.mount("/css", StaticFiles(directory="css"), name="css")
+app.mount("/js", StaticFiles(directory="js"), name="js")
 
 if __name__ == "__main__":
+    print("🏃 Devil Town Running Coach Server Starting...")
+    print("📍 Frontend: http://127.0.0.1:8000")
+    print("📍 API Docs: http://127.0.0.1:8000/docs")
+    print("💀 Skull Game & Devil Coach AI ready!")
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
