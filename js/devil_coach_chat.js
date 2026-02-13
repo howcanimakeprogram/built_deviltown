@@ -70,8 +70,20 @@ async function sendCoachMessage() {
         addCoachMessage(data.response, false);
 
     } catch (error) {
-        console.error('Error:', error);
-        addCoachMessage('아 씨발, 서버가 뒤졌네. API 키 확인하고 다시 시도해봐.', false);
+        console.error('Chat error:', error);
+
+        // Provide specific error messages
+        let errorMessage = '아 씨발, 서버가 뒤졌네. ';
+
+        if (error.message && error.message.includes('Failed to fetch')) {
+            errorMessage += 'API 서버 연결 실패. 백엔드(포트 8000) 확인해봐.';
+        } else if (error.message && error.message.includes('500')) {
+            errorMessage += 'API 키 확인하고 다시 시도해봐.';
+        } else {
+            errorMessage += `에러: ${error.message || '알 수 없는 오류'}`;
+        }
+
+        addCoachMessage(errorMessage, false);
     } finally {
         coachLoading.style.display = 'none';
         coachSendBtn.disabled = false;
