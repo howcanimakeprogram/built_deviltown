@@ -373,6 +373,34 @@ INFO:     127.0.0.1:52345 - "POST /chat HTTP/1.1" 200 OK
 
 ---
 
+## 2. System Architecture
+
+```mermaid
+graph TD
+    User([User]) -->|HTTPS Request| CF[Cloudflare Edge]
+    CF -->|Encrypted Tunnel| Tunnel[Cloudflared (Home Server)]
+    Tunnel -->|Forward Request| FastAPI[FastAPI Backend (Port 8000)]
+    
+    subgraph "Home Server (MacBook)"
+        Tunnel
+        FastAPI
+        Static[Static Files (HTML/CSS/JS)]
+        Logic[Business Logic]
+    end
+    
+    FastAPI -->|Serve| Static
+    FastAPI -->|Process| Logic
+    Logic -->|API Call| Gemini[Google Gemini API]
+```
+
+### Component Description
+-   **Frontend**: Single Page Application (SPA) served by FastAPI.
+-   **Backend**: FastAPI server handling static files and API requests.
+-   **AI Engine**: Google Gemini 1.5 Pro for generating coach responses.
+-   **Infrastructure**: Self-hosted on Mac, exposed via Cloudflare Tunnel.
+
+---
+
 ## 라이선스 및 크레딧
 
 **개발**: Devil Town Team  
