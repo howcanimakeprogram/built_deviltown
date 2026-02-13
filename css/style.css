@@ -1,0 +1,621 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  font-family: ui-monospace, Menlo, Monaco, Consolas, "Courier New", monospace;
+  overflow: hidden;
+  /* 기본: 대문 고정 */
+}
+
+/* ===== Background canvas ===== */
+#noise {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  opacity: 0.45;
+}
+
+/* ===== Intro stage ===== */
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#art {
+  text-align: center;
+  padding: 0;
+  /* 패딩도 제거 */
+  background: transparent;
+  /* 배경 제거 */
+  box-shadow: none;
+  /* 그림자 제거 */
+  border: none;
+  /* 테두리 제거 */
+}
+
+/* ===== ASCII ===== */
+pre {
+  margin: 0;
+  white-space: pre;
+  color: #fff;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.35),
+    0 0 18px rgba(255, 255, 255, 0.2);
+}
+
+#ascii {
+  font-size: clamp(10px, 1.15vw, 16px);
+  line-height: 1.02;
+  font-weight: 800;
+}
+
+#skullSpan {
+  display: block;
+  font-size: 1em;
+}
+
+#logoSpan {
+  display: block;
+  font-size: 0.70em;
+  margin-top: 12px;
+}
+
+#skullSpan.glitch {
+  animation: nudge 4.2s steps(6, end) infinite;
+  filter: brightness(1.1) contrast(1.2);
+}
+
+#logoSpan.glitch {
+  animation: logoFlicker 1.9s steps(2, end) infinite;
+  filter: brightness(1.05) contrast(1.15);
+}
+
+#skullSpan.burst,
+#logoSpan.burst {
+  text-shadow:
+    -4px 0 rgba(255, 255, 255, 0.55),
+    4px 0 rgba(255, 255, 255, 0.35),
+    0 0 24px rgba(255, 255, 255, 0.6),
+    0 0 64px rgba(255, 255, 255, 0.3);
+}
+
+@keyframes nudge {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  6% {
+    transform: translate(-3px, 1px);
+  }
+
+  12% {
+    transform: translate(4px, -2px);
+  }
+
+  18% {
+    transform: translate(-5px, 0);
+  }
+
+  24% {
+    transform: translate(3px, 2px);
+  }
+
+  30% {
+    transform: translate(0, -3px);
+  }
+
+  60% {
+    transform: translate(0, 0);
+  }
+
+  72% {
+    transform: translate(-4px, 2px);
+  }
+
+  84% {
+    transform: translate(5px, -2px);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes logoFlicker {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  45% {
+    opacity: 0.92;
+  }
+
+  46% {
+    opacity: 1;
+  }
+
+  78% {
+    opacity: 0.95;
+  }
+
+  79% {
+    opacity: 1;
+  }
+}
+
+/* ===== Menu ===== */
+.menu-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 30;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font: inherit;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease, transform 300ms ease;
+}
+
+body.menu-ready .menu-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: rgba(0, 0, 0, 0.50);
+  backdrop-filter: blur(2px);
+}
+
+.menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(360px, 88vw);
+  z-index: 26;
+  background: rgba(0, 0, 0, 0.78);
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  transform: translateX(100%);
+  transition: transform 260ms ease;
+  padding: 14px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+body.menu-open .menu-panel {
+  transform: translateX(0);
+}
+
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.menu-title {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+
+.menu-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font: inherit;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.menu-item {
+  width: 100%;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #fff;
+  font: inherit;
+  padding: 10px 10px;
+  cursor: pointer;
+}
+
+.menu-item.active {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.menu-help {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ===== Page overlay (content) ===== */
+#pageOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 22;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+#content {
+  position: fixed;
+  left: 50%;
+  top: 56px;
+  transform: translateX(-50%) translateY(10px);
+  width: min(980px, calc(100vw - 24px));
+  height: min(78vh, 720px);
+  z-index: 23;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms ease;
+  overflow: hidden;
+}
+
+body.page-open #pageOverlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+body.page-open #content {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.content-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.content-title {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.content-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font: inherit;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.content-body {
+  height: calc(100% - 49px);
+  overflow: auto;
+  padding: 14px 14px 30px;
+}
+
+/* content sections */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.section h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  letter-spacing: 0.06em;
+}
+
+.section p {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* Archive thumbnails */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  #content {
+    top: 48px;
+    height: min(82vh, 760px);
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 12px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
+}
+
+.thumb {
+  height: 140px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.08), transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.08em;
+}
+
+/* Marathoner cards */
+.run-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .run-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.run-photo {
+  margin-top: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.30);
+  padding: 10px;
+  overflow: auto;
+}
+
+.run-photo pre {
+  font-size: 9px;
+  line-height: 1.0;
+  text-shadow: none;
+  opacity: 0.95;
+}
+
+.small {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* ===== Playlist (Modal) helpers ===== */
+.playlist-open {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* ===== Video Modal ===== */
+#videoModal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+}
+
+body.video-open #videoModal {
+  display: block;
+}
+
+.video-modal-bg {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.video-modal-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(980px, calc(100vw - 24px));
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 90px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.video-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.video-modal-title {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  font-size: 1.4rem;
+  /* 키움 */
+  opacity: 1;
+}
+
+.video-modal-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font: inherit;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.video-modal-body {
+  padding: 12px;
+}
+
+.video-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 760px) {
+  .video-modal-panel {
+    width: calc(100vw - 16px);
+  }
+
+  .video-modal-body {
+    padding: 10px;
+  }
+}
+
+/* ===== Carousel Nav Buttons ===== */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  /* 배경 진하게 */
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 48px;
+  /* 크기 증가 */
+  height: 48px;
+  /* 크기 증가 */
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  /* 아이콘 크기 증가 */
+  transition: background 0.2s, transform 0.2s;
+  border-radius: 50%;
+  /* 원형 */
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* 비디오 프레임 높이의 반쯤에 위치하도록 top 조정 필요할 수 있으나,
+   absolute 부모가 .video-modal-body(상대위치)이므로 iframe 높이와 playlist 높이 고려해야 함.
+   간편하게는 iframe 컨테이너를 따로 두는 게 좋지만, 일단 top 30% 정도로 조정. */
+.nav-btn {
+  top: 30%;
+}
+
+.nav-btn.prev {
+  left: -24px;
+}
+
+.nav-btn.next {
+  right: -24px;
+}
+
+@media (max-width: 800px) {
+  .nav-btn.prev {
+    left: -10px;
+  }
+
+  .nav-btn.next {
+    right: -10px;
+  }
+}
+
+/* ===== Playlist (TOC) ===== */
+.video-playlist {
+  margin-top: 14px;
+  max-height: 150px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.playlist-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid transparent;
+  padding: 8px 12px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s;
+}
+
+.playlist-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.playlist-item.active {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-weight: bold;
+}

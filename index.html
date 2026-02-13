@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEVILTOWN</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <canvas id="noise"></canvas>
+
+  <!-- Intro stage -->
+  <div class="stage">
+    <div id="art">
+      <pre id="ascii"><span id="skullSpan"></span><span id="logoSpan"></span></pre>
+    </div>
+
+    <!-- Game Result Area -->
+    <div id="gameResult" style="
+      position: absolute; 
+      top: 60%; 
+      left: 50%; 
+      transform: translate(-50%, 0); 
+      text-align: center; 
+      pointer-events: none; 
+      display: none; 
+      z-index: 20;
+      font-family: monospace;
+      width: 80%;
+    "></div>
+  </div>
+
+  <!-- Top-right menu -->
+  <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false">MENU</button>
+  <div id="menuOverlay" class="menu-overlay" hidden></div>
+
+  <aside id="menuPanel" class="menu-panel" aria-hidden="true">
+    <div class="menu-header">
+      <div class="menu-title">DEVILTOWN</div>
+      <button id="menuClose" class="menu-close" aria-label="Close menu">✕</button>
+    </div>
+
+    <nav class="menu-items">
+      <button class="menu-item" data-key="wtfis">whatthefuckisdeviltown</button>
+      <button class="menu-item" data-key="schedule">Schedule</button>
+      <button class="menu-item" data-key="archive">Archive (Photo/Video)</button>
+      <button class="menu-item" data-key="mixes">Mixes</button>
+      <button class="menu-item" data-key="marathoner">Marathoner</button>
+      <button class="menu-item" data-key="skullgame">💀 Skull Game</button>
+      <button class="menu-item" data-key="devilcoach">Devil Coach (AI)</button>
+    </nav>
+
+    <div class="menu-help">
+      click item → open page<br />
+      ESC → close<br />
+      SPACE / tap → replay intro
+    </div>
+  </aside>
+
+  <!-- Page overlay -->
+  <div id="pageOverlay" hidden></div>
+
+  <!-- Video modal -->
+  <div id="videoModal" aria-hidden="true">
+    <div id="videoModalBg" class="video-modal-bg"></div>
+    <div class="video-modal-panel" role="dialog" aria-modal="true" aria-label="Video player">
+      <div class="video-modal-head">
+        <div id="videoModalTitle" class="video-modal-title">Playlist</div>
+        <button id="videoModalClose" class="video-modal-close" aria-label="Close video">✕</button>
+      </div>
+      <div class="video-modal-body" style="position:relative;">
+        <!-- Navigation Buttons -->
+        <button id="btnPrevVideo" class="nav-btn prev" aria-label="Previous video">❮</button>
+        <button id="btnNextVideo" class="nav-btn next" aria-label="Next video">❯</button>
+
+        <iframe id="videoModalFrame" class="video-frame" src="" title="YouTube video" frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+        <div id="videoCounter"
+          style="text-align:center; margin-top:10px; font-size:12px; opacity:0.7; font-weight:bold;"></div>
+
+        <!-- Playlist (TOC) -->
+        <div id="videoPlaylist" class="video-playlist"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page container (overlay panel) -->
+  <section id="content" aria-hidden="true">
+    <div class="content-header">
+      <div id="contentTitle" class="content-title">DEVILTOWN</div>
+      <button id="pageClose" class="content-close" aria-label="Close page">✕</button>
+    </div>
+
+    <div class="content-body">
+      <div id="sec-wtfis" class="section">
+        <h2>whatthefuckisdeviltown</h2>
+        <p>로고 / 디자인 파일 / 도안 / 그래픽 실험 / 비주얼 작업 아카이브.</p>
+        <p class="small">폴더 구조나 파일 링크는 추후 여기에 계속 추가.</p>
+        <div class="grid" style="margin-top:12px;">
+          <div class="card">
+            <div class="thumb">LOGO</div>
+            <div class="small" style="margin-top:10px;">DEVILTOWN logo set</div>
+          </div>
+          <div class="card">
+            <div class="thumb">TEES</div>
+            <div class="small" style="margin-top:10px;">T-shirt graphics</div>
+          </div>
+          <div class="card">
+            <div class="thumb">POSTER</div>
+            <div class="small" style="margin-top:10px;">Posters / Flyers</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skull Game Section -->
+      <div id="sec-skullgame" class="section">
+        <h2>💀 Skull Game (운명의 거리 뽑기)</h2>
+        <p>오늘 뛸 거리를 악마에게 물어보세요. 주사위를 굴려 운명을 결정하세요!</p>
+
+        <div
+          style="margin: 20px 0; padding: 20px; border: 1px dashed rgba(255,255,255,0.3); background: rgba(0,0,0,0.3); text-align: center;">
+          <button id="skullGameBtn" class="btn"
+            style="background: #333; border:1px solid #666; font-size:16px; padding: 10px 20px;">
+            운명의 주사위 굴리기 🎲
+          </button>
+          <div id="miniGameResult"
+            style="margin-top:15px; font-weight:bold; min-height:60px; white-space: pre-wrap; font-size:14px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Devil Coach Section -->
+      <div id="sec-devilcoach" class="section">
+        <h2>Devil Coach (악마 코치)</h2>
+        <p>욕쟁이 AI 코치와 대화하세요. 찰진 욕설과 팩트 폭격으로 정신 차리게 해드립니다.</p>
+
+        <!-- Chat Interface -->
+        <div class="coach-chat-container" style="
+          margin-top: 20px;
+          background: rgba(0,0,0,0.5);
+          border: 1px solid rgba(255,0,0,0.3);
+          border-radius: 10px;
+          overflow: hidden;
+        ">
+          <div id="coachChatMessages" style="
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          ">
+            <div class="coach-message" style="
+              background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+              padding: 12px 15px;
+              border-radius: 10px;
+              max-width: 80%;
+              align-self: flex-start;
+            ">
+              야 새끼야, 뭐 물어볼 거 있냐? 뛰기 싫다고 징징대지 말고 질문이나 해라 ㅋㅋ
+            </div>
+          </div>
+
+          <div style="
+            padding: 15px;
+            background: rgba(30,30,30,0.8);
+            border-top: 1px solid rgba(255,0,0,0.3);
+            display: flex;
+            gap: 10px;
+          ">
+            <input type="text" id="coachInput" placeholder="여기다 쳐봐... (예: 오늘 10km 뛰려는데 준비운동 뭐해?)" style="
+                flex: 1;
+                padding: 12px 15px;
+                background: rgba(20,20,20,0.9);
+                border: 1px solid rgba(255,0,0,0.3);
+                border-radius: 20px;
+                color: #fff;
+                font-size: 14px;
+                outline: none;
+              " />
+            <button id="coachSendBtn" class="btn" style="
+              padding: 12px 25px;
+              background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+              border: none;
+              border-radius: 20px;
+              font-weight: bold;
+              cursor: pointer;
+            ">
+              보내기
+            </button>
+          </div>
+        </div>
+
+        <div id="coachLoading" style="
+          display: none;
+          text-align: center;
+          margin-top: 10px;
+          font-size: 12px;
+          opacity: 0.7;
+        ">
+          <span>코치가 답변 준비 중...</span>
+        </div>
+      </div>
+
+      <div id="sec-schedule" class="section">
+        <h2>Schedule</h2>
+        <p>레이스 / 트래블 / 이벤트 공유 캘린더</p>
+
+        <div class="card" style="margin-top:20px; text-align:center; padding: 20px;">
+          <div style="font-size:14px; margin-bottom:15px; opacity:0.8;">
+            <p>모든 일정은 iCloud 캘린더로 관리됩니다.</p>
+            <p>아래 버튼을 눌러 구독하세요.</p>
+          </div>
+          <a class="btn" target="_blank"
+            href="webcal://p44-caldav.icloud.com/published/2/NDE4ODE1NjY2NDE4ODE1NqDjLwq8GMN_zupBHSe0DAmmz8VvM5LEnkcLBL298CvgpMqp9UnWVYdyl0KkEr3T51GFC-uIzKH_pnozZxt_HFc"
+            style="display:inline-block; margin:0 auto;">
+            📅 iCloud Calendar 구독
+          </a>
+        </div>
+      </div>
+
+      <div id="sec-archive" class="section">
+        <h2>Archive (Photo / Video)</h2>
+        <p>포토 / 비디오 아카이브 (비디오는 유튜브 업로드 예정)</p>
+
+        <div class="grid" style="margin-top:12px;">
+          <div class="card">
+            <div class="thumb">PHOTO</div>
+            <div class="small" style="margin-top:10px;">2nd anniversary</div>
+          </div>
+
+          <div class="card">
+            <button class="playlist-open" data-title="ĐɆVłⱠ₮Ø₩₦ ⱤɆ₳ĐɎ 2 ĐⱤł₦₭"
+              data-videos="o2_g_GyF1iE,TzyiGAERKVw,vbeBVo2jiRY,_7P7_9RgDQM,vbeBVo2jiRY,w35YjgOUaZk"
+              data-titles="CHBS,tejava_assassins,VIC_CATLE,FAACIA,TENJU,mhmd"
+              data-instagrams="https://www.instagram.com/givemeazerocoke/,https://www.instagram.com/tejava_assassins/,https://www.instagram.com/vic_catle/,https://www.instagram.com/faacia.or0/,https://www.instagram.com/tenjumakes/,https://www.instagram.com/mhmd_muhammmmmad/">
+              <div class="thumb">VIDEO</div>
+              <div class="small" style="margin-top:10px;">
+                ĐɆVłⱠ₮Ø₩₦ ⱤɆ₳ĐɆ 2 ĐⱤł₦₭ ▶
+              </div>
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="thumb">DESIGN</div>
+            <div class="small" style="margin-top:10px;">Artwork archive</div>
+          </div>
+
+          <div class="card">
+            <div class="thumb">PHOTO</div>
+            <div class="small" style="margin-top:10px;">Album placeholder</div>
+          </div>
+
+          <div class="card">
+            <div class="thumb">VIDEO</div>
+            <div class="small" style="margin-top:10px;">Playlist placeholder</div>
+          </div>
+
+          <div class="card">
+            <div class="thumb">DESIGN</div>
+            <div class="small" style="margin-top:10px;">Archive placeholder</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sec-mixes" class="section">
+        <h2>Mixes</h2>
+        <p>믹스셋 업로드 방식 확정되면 여기에 연결.</p>
+        <p class="small">Mixcloud / hearthis.at / 직접 호스팅 등 후보 검토 중.</p>
+        <div class="grid" style="margin-top:12px;">
+          <div class="card">
+            <div class="thumb">MIX #1</div>
+            <div class="small" style="margin-top:10px;">placeholder</div>
+          </div>
+          <div class="card">
+            <div class="thumb">MIX #2</div>
+            <div class="small" style="margin-top:10px;">placeholder</div>
+          </div>
+          <div class="card">
+            <div class="thumb">MIX #3</div>
+            <div class="small" style="margin-top:10px;">placeholder</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="sec-marathoner" class="section">
+        <h2>Marathoner</h2>
+        <p>러닝 기록 + 사진 + 이력 (일단 사진은 아스키 해골로 대체)</p>
+
+        <div class="run-grid" style="margin-top:12px;">
+          <div class="card">
+            <div><b>Race #1</b> · 42.195K · 00:00:00</div>
+            <div class="small">YYYY-MM-DD · Location</div>
+            <div class="run-photo">
+              <pre class="runSkull"></pre>
+            </div>
+          </div>
+          <div class="card">
+            <div><b>Race #2</b> · 21.1K · 00:00:00</div>
+            <div class="small">YYYY-MM-DD · Location</div>
+            <div class="run-photo">
+              <pre class="runSkull"></pre>
+            </div>
+          </div>
+          <div class="card">
+            <div><b>Race #3</b> · 10K · 00:00:00</div>
+            <div class="small">YYYY-MM-DD · Location</div>
+            <div class="run-photo">
+              <pre class="runSkull"></pre>
+            </div>
+          </div>
+          <div class="card">
+            <div><b>Race #4</b> · Trail · 00:00:00</div>
+            <div class="small">YYYY-MM-DD · Location</div>
+            <div class="run-photo">
+              <pre class="runSkull"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Imports -->
+  <script src="js/script.js"></script>
+  <script type="module" src="js/devil_coach.js"></script>
+  <script src="js/devil_coach_chat.js"></script>
+</body>
+
+</html>
