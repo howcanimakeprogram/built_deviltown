@@ -1,3 +1,6 @@
+# Devil Town Running Coach - FastAPI Backend
+# This server provides the /chat endpoint for AI coach interactions
+
 import os
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -7,26 +10,34 @@ from pydantic import BaseModel
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables from .env file
+# IMPORTANT: .env contains GOOGLE_API_KEY and should NEVER be committed to Git
 load_dotenv()
 
 app = FastAPI()
 
-# Add CORS middleware
+# Add CORS middleware to allow cross-origin requests
+# This allows the frontend (port 8999) to call this API (port 8000)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=["*"],  # TODO: In production, specify exact origins like ["http://yourdomain.com"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Configure Gemini API
+# Load API key from environment variable (set in .env file)
 API_KEY = os.getenv("GOOGLE_API_KEY")
 if not API_KEY:
     print("Warning: GOOGLE_API_KEY not found in environment variables.")
+    print("Please create a .env file with: GOOGLE_API_KEY=your_key_here")
 
-# Model configuration
+# Gemini model configuration
+# temperature: 1.0 = creative/varied responses
+# top_p: 0.95 = nucleus sampling for diversity
+# top_k: 40 = consider top 40 tokens
+# max_output_tokens: 8192 = maximum response length
 generation_config = {
   "temperature": 1,
   "top_p": 0.95,
@@ -36,6 +47,10 @@ generation_config = {
 }
 
 def get_system_prompt():
+    """
+    Load the AI persona from system_prompt.md
+    This defines the "매미킴 맛 찐친 러닝 코치" personality
+    """
     try:
         with open("system_prompt.md", "r", encoding="utf-8") as f:
             return f.read()
@@ -48,6 +63,17 @@ class ChatRequest(BaseModel):
 
 @app.post("/chat")
 async def chat_endpoint(request: ChatRequest):
+    """
+    Main chat endpoint for AI coach interactions
+    
+    Request body:
+        - message: User's message
+        - history: Previous conversation history
+    
+    Returns:
+        - response: AI coach's response
+    """
+    # Check if API key is configured
     if not API_KEY:
          raise HTTPException(status_code=500, detail="API Key not configured")
     
@@ -60,10 +86,9 @@ async def chat_endpoint(request: ChatRequest):
         system_instruction=system_instruction,
     )
 
-    # Convert history into the format Gemini expects (if needed)
-    # For simplicity in this demo, we might just append history to the context or use start_chat
-    # Let's use start_chat with history
-    
+    # Convert chat history to Gemini's format
+    # Frontend sends: [{role: 'user'|'assistant', content: 'text'}]
+    # Gemini expects: [{role: 'user'|'model', parts: ['text']}]
     formatted_history = []
     for msg in request.history:
         role = "user" if msg['role'] == 'user' else "model"
@@ -73,10 +98,12 @@ async def chat_endpoint(request: ChatRequest):
         history=formatted_history
     )
 
+    # Send message to Gemini and get response
     try:
         response = chat_session.send_message(request.message)
         return {"response": response.text}
     except Exception as e:
+        # Log error and return 500 status
         print(f"Error calling Gemini API: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 

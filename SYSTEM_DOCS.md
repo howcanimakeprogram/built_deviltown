@@ -107,10 +107,12 @@ pip install -r requirements.txt
 - `python-dotenv==1.0.0`: 환경 변수 관리
 
 ### 3. API 키 설정
-`.env` 파일이 이미 생성되어 있으며, API 키가 설정되어 있습니다:
+`.env` 파일을 생성하고 Google Gemini API 키를 입력하세요:
 ```env
-GOOGLE_API_KEY=AIzaSyCg3LRwd5dyUDrYzuyX2OVz3ST3YEQFnc4
+GOOGLE_API_KEY=your_actual_api_key_here
 ```
+
+API 키는 [Google AI Studio](https://aistudio.google.com/)에서 발급받을 수 있습니다.
 
 > ⚠️ **보안 주의**: `.env` 파일은 절대 Git에 커밋하지 마세요!
 

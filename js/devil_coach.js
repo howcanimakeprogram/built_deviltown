@@ -1,19 +1,18 @@
 /* ===== Devil Coach Logic ===== */
+// NOTE: This file contains the OLD single-use coach feature
+// The NEW AI chat feature is in devil_coach_chat.js
+// This file is kept for backward compatibility with the "정신 교육 받기" button
+
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 const coachBtn = document.getElementById("coachBtn");
 const coachResult = document.getElementById("coachResult");
 
-// Obfuscated API Key
-const _p1 = "QUl6YVN5Qw=="; // AIzaSyC
-const _p2 = "ZzNMUndkNQ=="; // g3LRwd5
-const _p3 = "ZHlVRHJZeg=="; // dyUDrYz
-const _p4 = "dXlYMk9WeQ=="; // uyX2OVz
-const _p5 = "M1NUM1lFUQ=="; // 3ST3YEQ
-const _p6 = "Rm5jNA==";     // Fnc4
-
+// NOTE: API key is now handled by the backend (main.py)
+// This frontend code is deprecated and should not be used for new features
 function getSecret() {
-    return atob(_p1) + atob(_p2) + atob(_p3) + atob(_p4) + atob(_p5) + atob(_p6); // Reassemble
+    // Removed for security - API calls should go through backend
+    return null;
 }
 
 if (coachBtn) {
