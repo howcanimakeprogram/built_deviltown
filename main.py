@@ -19,10 +19,14 @@ load_dotenv()
 app = FastAPI()
 
 # Add CORS middleware to allow cross-origin requests
-# This allows the frontend (port 8999) to call this API (port 8000)
+# This allows the frontend to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: In production, specify exact origins like ["http://yourdomain.com"]
+    allow_origins=[
+        "*",  # For development
+        "https://welcometodeviltown.com",
+        "https://www.welcometodeviltown.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
