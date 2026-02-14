@@ -335,7 +335,7 @@ function openPage(key) {
     archive: "Archive (Photo/Video)",
     mixes: "Mixes",
     marathoner: "Marathoner",
-    skullgame: "💀 Skull Game",
+    devilcoach: "Devil Coach (AI)",
   };
   contentTitle.textContent = titleMap[key] || "DEVILTOWN";
 

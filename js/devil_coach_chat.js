@@ -1,9 +1,19 @@
-/* ===== Devil Coach Chat Integration ===== */
+/* ===== Devil Coach Gemini Integration ===== */
+import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 const coachInput = document.getElementById('coachInput');
 const coachSendBtn = document.getElementById('coachSendBtn');
 const coachChatMessages = document.getElementById('coachChatMessages');
 const coachLoading = document.getElementById('coachLoading');
+
+// Obfuscated API Key: AIzaSyCg3LRwd5dyUDrYzuyX2OVz3ST3YEQFnc4
+const _p1 = "QUl6YVN5Q2czTFJ3ZDVk"; // AIzaSyCg3LRwd5d
+const _p2 = "eVVEcll6dXlYMk9WejNT"; // yUDrYzuyX2OVz3S
+const _p3 = "VDNZRVFGbmM0";         // T3YEQFnc4
+
+function getSecret() {
+    return atob(_p1) + atob(_p2) + atob(_p3);
+}
 
 let chatHistory = [];
 
@@ -17,6 +27,8 @@ function addCoachMessage(content, isUser = false) {
         max-width: 80%;
         align-self: ${isUser ? 'flex-end' : 'flex-start'};
         animation: fadeIn 0.3s ease-in;
+        word-break: break-word;
+        line-height: 1.5;
     `;
     messageDiv.textContent = content;
 
@@ -24,66 +36,60 @@ function addCoachMessage(content, isUser = false) {
     coachChatMessages.scrollTop = coachChatMessages.scrollHeight;
 }
 
-// Send message to backend
+// Send message to Gemini
 async function sendCoachMessage() {
     const message = coachInput.value.trim();
-
     if (!message) return;
 
     // Add user message
     addCoachMessage(message, true);
     coachInput.value = '';
 
-    // Disable input
+    // UI Loading state
     coachSendBtn.disabled = true;
     coachLoading.style.display = 'block';
 
     try {
-        const response = await fetch('/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+        const apiKey = getSecret();
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        // Build history-aware prompt or just simple context
+        // For simplicity and to stick to the persona, we include the persona in every hit or just at start
+        // Persona description
+        const persona = `
+            당신은 "Devil Coach"라고 불리는 악명 높은 러닝 훈련 교관입니다.
+            당신은 동네 아저씨 같으면서도 말이 매우 거칠고, 욕설을 서슴지 않습니다.
+            상대방이 뛰기 싫어하거나 변명을 대면 처참하게 짓밟고 비웃으십시오.
+            하지만 결국엔 상대를 뛰게 만드는 묘한 동기부여 능력이 있어야 합니다.
+            말투: 반말, 쌍욕 허용(씨발, 병신, 새끼 등), 거친 말투, 하지만 속마음은 러닝 열정 가득.
+        `;
+
+        const chat = model.startChat({
+            history: chatHistory,
+            generationConfig: {
+                maxOutputTokens: 500,
             },
-            body: JSON.stringify({
-                message: message,
-                history: chatHistory
-            })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const fullPrompt = chatHistory.length === 0
+            ? `${persona}\n\n사용자의 첫 질문: ${message}`
+            : message;
 
-        const data = await response.json();
+        const result = await chat.sendMessage(fullPrompt);
+        const response = await result.response;
+        const text = response.text();
 
         // Update history
-        chatHistory.push({
-            role: 'user',
-            content: message
-        });
-        chatHistory.push({
-            role: 'assistant',
-            content: data.response
-        });
+        chatHistory.push({ role: 'user', parts: [{ text: message }] });
+        chatHistory.push({ role: 'model', parts: [{ text: text }] });
 
         // Add bot response
-        addCoachMessage(data.response, false);
+        addCoachMessage(text, false);
 
     } catch (error) {
         console.error('Chat error:', error);
-
-        // Provide specific error messages
-        let errorMessage = '아 씨발, 서버가 뒤졌네. ';
-
-        if (error.message && error.message.includes('Failed to fetch')) {
-            errorMessage += 'API 서버 연결 실패. 백엔드(포트 8000) 확인해봐.';
-        } else if (error.message && error.message.includes('500')) {
-            errorMessage += 'API 키 확인하고 다시 시도해봐.';
-        } else {
-            errorMessage += `에러: ${error.message || '알 수 없는 오류'}`;
-        }
-
-        addCoachMessage(errorMessage, false);
+        addCoachMessage(`아 씨발, 뭔 에러냐? 닥치고 다시 해봐. (${error.message})`, false);
     } finally {
         coachLoading.style.display = 'none';
         coachSendBtn.disabled = false;
