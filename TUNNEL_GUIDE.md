@@ -6,7 +6,7 @@
 sequenceDiagram
     participant User as 🌍 전 세계 사용자
     participant CF as ☁️ Cloudflare Edge
-    participant Tunnel as 🚇 Cloudflared (내 맥북)
+    participant Tunnel as 🚇 Cloudflared (내 PC)
     participant App as 🐍 FastAPI (포트 8000)
 
     User->>CF: https://welcometodeviltown.com 접속
@@ -35,7 +35,7 @@ cloudflared tunnel run deviltown
 ```
 
 ### 2. 백그라운드 실행 (창 꺼도 유지)
-맥북이 켜져 있는 한 계속 돌아가게 하려면 서비스로 등록해야 합니다.
+PC가 켜져 있는 한 계속 돌아가게 하려면 서비스로 등록해야 합니다.
 
 ```bash
 # 서비스 설치
@@ -109,11 +109,11 @@ winget upgrade Cloudflare.cloudflared
 ## 🚨 트러블슈팅 (문제 해결)
 
 ### Q. 사이트가 안 들어가져요! (502 Bad Gateway)
-1.  **내 맥북의 서버가 켜져 있나?**: `python main.py`가 실행 중인지 확인하세요.
+1.  **내 PC의 서버가 켜져 있나?**: `python main.py`가 실행 중인지 확인하세요.
 2.  **터널이 켜져 있나?**: `cloudflared tunnel run deviltown`이 실행 중인지 확인하세요.
 3.  **포트가 맞나?**: `config.yml`에 `localhost:8000`이 맞는지 확인하세요.
 
-### Q. PC/맥북이 꺼지지 않게 하려면?
+### Q. PC가 꺼지지 않게 하려면?
 - **Windows**: 전원 옵션 > 절전 모드 해제
 - **Mac**: 설정 > 디스플레이 > "디스플레이가 꺼져도 잠들지 않음" 체크
 
