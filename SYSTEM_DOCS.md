@@ -70,7 +70,7 @@ Server: Uvicorn (ASGI)
                       ▼
 ┌─────────────────────────────────────────────────┐
 │         Google Gemini API                        │
-│  - Model: gemini-2.0-flash-exp                   │
+│  - Model: gemini-1.5-pro                   │
 │  - System Instruction: 매미킴 맛 찐친 페르소나    │
 │  - Temperature: 1.0                              │
 └─────────────────────────────────────────────────┘
@@ -318,7 +318,7 @@ INFO:     127.0.0.1:52345 - "POST /chat HTTP/1.1" 200 OK
 
 ### 업데이트 체크리스트
 - [ ] `requirements.txt` 의존성 버전 확인
-- [ ] Gemini API 모델 버전 확인 (`gemini-2.0-flash-exp`)
+- [ ] Gemini API 모델 버전 확인 (`gemini-1.5-pro`)
 - [ ] 보안 패치 적용
 - [ ] `system_prompt.md` 개선 사항 반영
 
@@ -433,7 +433,7 @@ graph TD
 ## 라이선스 및 크레딧
 
 **개발**: Devil Town Team  
-**AI**: Google Gemini 2.0 Flash  
+**AI**: Google Gemini 1.5 Pro  
 **프레임워크**: FastAPI  
 **페르소나**: 방구석 여포
 
