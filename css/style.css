@@ -260,6 +260,38 @@ body.menu-open .menu-panel {
   line-height: 1.6;
 }
 
+/* ===== Responsive Menu (Desktop vs Mobile) ===== */
+
+/* ===== Responsive Menu Adjustments ===== */
+
+/* Mobile & Tablet: Larger fonts and wider sidebar for better touch targets */
+@media (max-width: 768px) {
+  .menu-panel {
+    width: 85vw;
+    /* Wider on mobile */
+    max-width: 320px;
+  }
+
+  .menu-items {
+    gap: 20px;
+    /* More space between items */
+    margin-top: 20px;
+  }
+
+  .menu-item {
+    font-size: 1.35rem;
+    /* Significantly larger font */
+    padding: 15px 12px;
+    /* Larger touch target */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    /* Separator for clarity */
+  }
+
+  .menu-title {
+    font-size: 1.4rem;
+  }
+}
+
 /* ===== Page overlay (content) ===== */
 #pageOverlay {
   position: fixed;

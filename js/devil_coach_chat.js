@@ -10,6 +10,7 @@ let chatHistory = [];
 // Add message to chat
 function addCoachMessage(content, isUser = false) {
     const messageDiv = document.createElement('div');
+    messageDiv.className = isUser ? 'user-message' : 'coach-message';
     messageDiv.style.cssText = `
         background: ${isUser ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #ff0000 0%, #cc0000 100%)'};
         padding: 12px 15px;
@@ -17,9 +18,15 @@ function addCoachMessage(content, isUser = false) {
         max-width: 80%;
         align-self: ${isUser ? 'flex-end' : 'flex-start'};
         animation: fadeIn 0.3s ease-in;
+        color: #fff;
+        line-height: 1.5;
+        font-size: 14px;
+        word-break: break-word;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
     `;
     messageDiv.textContent = content;
 
+    console.log(`Adding message: ${content.substring(0, 20)}... (User: ${isUser})`);
     coachChatMessages.appendChild(messageDiv);
     coachChatMessages.scrollTop = coachChatMessages.scrollHeight;
 }
@@ -39,7 +46,7 @@ async function sendCoachMessage() {
     coachLoading.style.display = 'block';
 
     try {
-        const response = await fetch('http://127.0.0.1:8000/chat', {
+        const response = await fetch('/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,6 +62,15 @@ async function sendCoachMessage() {
         }
 
         const data = await response.json();
+        let cleanResponse = data.response;
+
+        // Strip markdown-style formatting patterns completely
+        cleanResponse = cleanResponse.replace(/\*\*/g, '') // bold
+            .replace(/\*/g, '')  // italics/bullets
+            .replace(/__/g, '')  // bold 2
+            .replace(/_/g, '')   // italics 2
+            .replace(/#/g, '')   // headers
+            .replace(/`/g, '');  // code
 
         // Update history
         chatHistory.push({
@@ -63,11 +79,11 @@ async function sendCoachMessage() {
         });
         chatHistory.push({
             role: 'assistant',
-            content: data.response
+            content: cleanResponse
         });
 
         // Add bot response
-        addCoachMessage(data.response, false);
+        addCoachMessage(cleanResponse, false);
 
     } catch (error) {
         console.error('Chat error:', error);

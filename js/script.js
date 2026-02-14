@@ -252,70 +252,75 @@ if (asciiContainer) {
   });
 }
 
-function runSkullGame() {
+const skullGameBtn = document.getElementById("skullGameBtn");
+if (skullGameBtn) {
+  skullGameBtn.addEventListener("click", () => {
+    if (isRolling) return;
+    runSkullGame();
+  });
+}
+
+async function runSkullGame() {
+  if (isRolling) return;
   isRolling = true;
-  if (!gameResult) return;
 
-  gameResult.style.display = "block";
-  gameResult.style.color = "#ff3333";
-  gameResult.style.textShadow = "0 0 5px red";
-  gameResult.innerHTML = "SEARCHING YOUR FATE..."; // Initial text
+  const miniResult = document.getElementById("miniGameResult");
+  if (!miniResult) return;
 
-  // Visual scramble effect on skull
+  // Clear previous results and show rolling state below the button
+  miniResult.style.display = "flex";
+  miniResult.innerHTML = '<div style="font-size: 1.2rem; color: #ff0000; font-weight: bold; animation: pulse 0.5s infinite;">운명을 결정하는 중...</div>';
+
   skullSpan.classList.add("burst");
 
   let steps = 0;
-  const maxSteps = 20;
+  const maxSteps = 25;
   const interval = setInterval(() => {
     steps++;
-    // Random intermediate numbers
     const tmp = Math.floor(Math.random() * 42);
-    gameResult.textContent = `🎲 ${tmp}km...`;
+    miniResult.innerHTML = `<div style="font-size: 3.5rem; font-weight: 900; color: #ff0000; text-shadow: 0 0 15px rgba(255,0,0,0.5);">${tmp}km...</div>`;
 
     if (steps > maxSteps) {
       clearInterval(interval);
-      finalizeGameResult();
+      finalizeGameResult(miniResult);
     }
-  }, 100);
+  }, 70);
 }
 
-function finalizeGameResult() {
+async function finalizeGameResult(target) {
   skullSpan.classList.remove("burst");
-  isRolling = false;
 
-  const rand = Math.random() * 100; // 0.0 ~ 99.9xx
+  const rand = Math.random() * 100;
   let distance = "";
-  let message = "";
+  if (rand < 1) distance = "0km";
+  else if (rand < 2) distance = "42.195km";
+  else if (rand < 7) distance = "30km LSD";
+  else distance = `${Math.floor(Math.random() * 19) + 3}km`;
 
-  // Probability Logic
-  // 0km: 1% (Extreme luck)
-  // 30km: 5% (Hell's LSD)
-  // 42.195km: 1% (Full course)
-  // Others: Normal distribution
+  target.innerHTML = `
+    <div style="font-size: 4rem; font-weight: 900; color: #ff0000; text-shadow: 0 0 20px rgba(255,0,0,0.6); line-height: 1; margin: 0;">${distance}</div>
+    <div id="diceComment" style="font-size: 1.1rem; color: #fff; font-weight: bold; margin-top: 15px; text-align: center; opacity: 0.8;">악마가 코멘트를 작성 중...</div>
+  `;
 
-  if (rand < 1) { // 0 ~ 1 (1%)
-    distance = "0km";
-    message = "천국의 휴식? 아니... 지옥의 방관이다. 오늘은 쉬어라.";
-  } else if (rand < 2) { // 1 ~ 2 (1%)
-    distance = "42.195km";
-    message = "풀코스 당첨!!! 죽을 때까지 뛰어라! 악마가 지켜본다.";
-  } else if (rand < 7) { // 2 ~ 7 (5%)
-    distance = "30km LSD";
-    message = "지옥주 시작이다! 30km LSD 실시! 토나올 때까지!";
-  } else {
-    // Random 3km ~ 21km
-    const km = Math.floor(Math.random() * 19) + 3; // 3 to 21
-    distance = `${km}km`;
-    message = "당장 운동화 신어! 핑계 대지 마라!";
+  try {
+    const response = await fetch('/dice-comment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ distance: distance })
+    });
+    const data = await response.json();
+    const commentEl = document.getElementById("diceComment");
+    if (commentEl) {
+      commentEl.textContent = data.comment;
+      commentEl.style.opacity = "1";
+    }
+  } catch (err) {
+    console.error("Dice comment error:", err);
+    const commentEl = document.getElementById("diceComment");
+    if (commentEl) commentEl.textContent = "당장 뛰어! 지옥이 기다린다.";
   }
 
-  gameResult.innerHTML = `
-    <div style="font-size: 2em; font-weight: bold;">${distance}</div>
-    <div style="font-size: 14px; margin-top: 5px; color: #fff;">${message}</div>
-    <div style="font-size: 11px; margin-top: 10px; color: #666;">
-      (0km: 1% | 30km: 5% | Full: 1%)
-    </div>
-  `;
+  isRolling = false;
 }
 
 function openPage(key) {
@@ -335,7 +340,8 @@ function openPage(key) {
     archive: "Archive (Photo/Video)",
     mixes: "Mixes",
     marathoner: "Marathoner",
-    skullgame: "💀 Skull Game",
+    skullgame: "🎲 SKULL Dice",
+    devilcoach: "Devil Coach (AI)",
   };
   contentTitle.textContent = titleMap[key] || "DEVILTOWN";
 
