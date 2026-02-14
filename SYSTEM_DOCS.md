@@ -373,57 +373,57 @@ INFO:     127.0.0.1:52345 - "POST /chat HTTP/1.1" 200 OK
 
 ---
 
-## 2. System Architecture
+## 2. 시스템 구조도 (System Architecture)
 
 ```mermaid
 graph TD
-    User([User]) -->|HTTPS Request| CF[Cloudflare Edge]
-    CF -->|Encrypted Tunnel| Tunnel[Cloudflared (Home Server)]
-    Tunnel -->|Forward Request| FastAPI[FastAPI Backend (Port 8000)]
+    User([사용자]) -->|HTTPS 요청| CF[Cloudflare Edge]
+    CF -->|암호화된 터널| Tunnel[Cloudflared (홈 서버)]
+    Tunnel -->|요청 전달| FastAPI[FastAPI 백엔드 (8000번 포트)]
     
-    subgraph "Home Server (MacBook)"
+    subgraph "홈 서버 (윈도우/맥북)"
         Tunnel
         FastAPI
-        Static[Static Files (HTML/CSS/JS)]
-        Logic[Business Logic]
+        Static[정적 파일 (HTML/CSS/JS)]
+        Logic[비즈니스 로직]
     end
     
-    FastAPI -->|Serve| Static
-    FastAPI -->|Process| Logic
-    Logic -->|API Call| Gemini[Google Gemini API]
+    FastAPI -->|제공| Static
+    FastAPI -->|처리| Logic
+    Logic -->|API 호출| Gemini[Google Gemini API]
 ```
 
-### Component Description
--   **Frontend**: Single Page Application (SPA) served by FastAPI.
--   **Backend**: FastAPI server handling static files and API requests.
--   **AI Engine**: Google Gemini 1.5 Pro for generating coach responses.
--   **Infrastructure**: Self-hosted on Windows Mini PC (Production) & MacBook (Dev), exposed via Cloudflare Tunnel.
+### 구성 요소 설명
+- **프론트엔드**: FastAPI가 제공하는 단일 페이지 웹앱 (SPA).
+- **백엔드**: 정적 파일 및 API 요청을 처리하는 Python 서버.
+- **AI 엔진**: 코치 답변을 생성하는 구글 제미나이 1.5 Pro.
+- **인프라**: 집에서 직접 돌리는 서버 (Cloudflare Tunnel로 외부 연결).
 
-### 2.1 Server Infrastructure Details
+### 2.1 서버 인프라 상세 정보
 
-| Role | Device | OS | Specs | Location | Project Path |
+| 역할 | 기기 | OS | 사양 | 위치 | 프로젝트 경로 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Production** | Windows Mini PC | Windows 11 | Intel N100 / 16GB RAM | Home Server | `[To be configured]` |
-| **Development** | MacBook Pro | macOS | M-Series / 16GB+ RAM | Local Dev | `/Users/chaehyeonbyeongsin/Desktop/코딩/데빌타운 웹사이트` |
+| **운영 (Production)** | 윈도우 미니 PC | Windows 11 | Intel N100 / 16GB RAM | 홈 서버 | `[설정 필요]` |
+| **개발 (Development)** | 맥북 프로 | macOS | M-Series / 16GB+ RAM | 로컬 개발 | `/Users/chaehyeonbyeongsin/Desktop/코딩/데빌타운 웹사이트` |
 
-### 2.2 Cloudflare Tunnel Configuration (Windows)
-To expose the local Windows server to the internet using the custom domain:
+### 2.2 Cloudflare Tunnel 설정 (윈도우용)
+윈도우 서버를 도메인(`welcometodeviltown.com`)과 연결하는 방법입니다.
 
-1.  **Install Cloudflared**:
+1.  **프로그램 설치**:
     ```powershell
     winget install Cloudflare.cloudflared
     ```
-2.  **Login & Create Tunnel**:
+2.  **로그인 & 터널 생성**:
     ```powershell
     cloudflared tunnel login
     cloudflared tunnel create deviltown
     ```
-3.  **Connect Domain**:
+3.  **도메인 연결**:
     ```powershell
     cloudflared tunnel route dns deviltown welcometodeviltown.com
     cloudflared tunnel route dns deviltown www.welcometodeviltown.com
     ```
-4.  **Run Tunnel**:
+4.  **터널 실행**:
     ```powershell
     cloudflared tunnel run deviltown
     ```
@@ -435,7 +435,7 @@ To expose the local Windows server to the internet using the custom domain:
 **개발**: Devil Town Team  
 **AI**: Google Gemini 2.0 Flash  
 **프레임워크**: FastAPI  
-**페르소나**: 김동현(매미킴) 밈 영감
+**페르소나**: 방구석 여포
 
 ---
 
