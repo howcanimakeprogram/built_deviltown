@@ -397,7 +397,18 @@ graph TD
 -   **Frontend**: Single Page Application (SPA) served by FastAPI.
 -   **Backend**: FastAPI server handling static files and API requests.
 -   **AI Engine**: Google Gemini 1.5 Pro for generating coach responses.
--   **Infrastructure**: Self-hosted on Mac, exposed via Cloudflare Tunnel.
+-   **Infrastructure**: Self-hosted on Windows Mini PC (Production) & MacBook (Dev), exposed via Cloudflare Tunnel.
+
+### 2.1 Server Infrastructure Details
+
+| Role | Device | OS | Specs | Location | Project Path |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Production** | Windows Mini PC | Windows 11 | Intel N100 / 16GB RAM | Home Server | `C:\Users\Public\serveradmin_env\Deviltown website` |
+| **Development** | MacBook Pro | macOS | M-Series / 16GB+ RAM | Local Dev | `/Users/chaehyeonbyeongsin/Desktop/코딩/데빌타운 웹사이트` |
+
+> **Note**: Both environments use **Cloudflare Tunnel** to expose the local server to `welcometodeviltown.com`.
+> - **Production (Win)**: Always-on server.
+> - **Dev (Mac)**: Used for coding & testing (Tunnel usually off).
 
 ---
 
