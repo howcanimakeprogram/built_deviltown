@@ -39,20 +39,20 @@ OS: macOS (Main Dev) & Windows 10 Home (Production Server)
 ### 시스템 구조도
 ```mermaid
 graph TD
-    User([사용자]) -->|HTTPS 요청| CF[Cloudflare Edge]
-    CF -->|암호화된 터널| Tunnel[Cloudflared (홈 서버)]
-    Tunnel -->|요청 전달| FastAPI[FastAPI 백엔드 (8000번 포트)]
+    User([User]) -->|HTTPS Request| CF[Cloudflare Edge]
+    CF -->|Encrypted Tunnel| Tunnel["Cloudflared (Home Server)"]
+    Tunnel -->|Forward Request| FastAPI["FastAPI Backend (Port 8000)"]
     
-    subgraph "홈 서버 인프라 (Home Server Infrastructure)"
+    subgraph "Home Server Infrastructure"
         Tunnel
         FastAPI
-        Static[정적 파일 (HTML/CSS/JS)]
-        Logic[비즈니스 로직]
+        Static["Static Files (HTML/CSS/JS)"]
+        Logic["Business Logic"]
     end
     
-    FastAPI -->|제공| Static
-    FastAPI -->|처리| Logic
-    Logic -->|API 호출| Gemini[Google Gemini API]
+    FastAPI -->|Serve| Static
+    FastAPI -->|Process| Logic
+    Logic -->|API Call| Gemini[Google Gemini API]
 ```
 
 ### 서버 인프라 상세 정보
