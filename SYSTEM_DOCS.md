@@ -403,12 +403,30 @@ graph TD
 
 | Role | Device | OS | Specs | Location | Project Path |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Production** | Windows Mini PC | Windows 11 | Intel N100 / 16GB RAM | Home Server | `C:\Users\Public\serveradmin_env\Deviltown website` |
+| **Production** | Windows Mini PC | Windows 11 | Intel N100 / 16GB RAM | Home Server | `[To be configured]` |
 | **Development** | MacBook Pro | macOS | M-Series / 16GB+ RAM | Local Dev | `/Users/chaehyeonbyeongsin/Desktop/코딩/데빌타운 웹사이트` |
 
-> **Note**: Both environments use **Cloudflare Tunnel** to expose the local server to `welcometodeviltown.com`.
-> - **Production (Win)**: Always-on server.
-> - **Dev (Mac)**: Used for coding & testing (Tunnel usually off).
+### 2.2 Cloudflare Tunnel Configuration (Windows)
+To expose the local Windows server to the internet using the custom domain:
+
+1.  **Install Cloudflared**:
+    ```powershell
+    winget install Cloudflare.cloudflared
+    ```
+2.  **Login & Create Tunnel**:
+    ```powershell
+    cloudflared tunnel login
+    cloudflared tunnel create deviltown
+    ```
+3.  **Connect Domain**:
+    ```powershell
+    cloudflared tunnel route dns deviltown welcometodeviltown.com
+    cloudflared tunnel route dns deviltown www.welcometodeviltown.com
+    ```
+4.  **Run Tunnel**:
+    ```powershell
+    cloudflared tunnel run deviltown
+    ```
 
 ---
 
