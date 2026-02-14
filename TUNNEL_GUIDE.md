@@ -6,7 +6,7 @@
 sequenceDiagram
     participant User as 🌍 전 세계 사용자
     participant CF as ☁️ Cloudflare Edge
-    participant Tunnel as 🚇 Cloudflared (내 맥북)
+    participant Tunnel as 🚇 Cloudflared (내 PC)
     participant App as 🐍 FastAPI (포트 8000)
 
     User->>CF: https://welcometodeviltown.com 접속
@@ -20,7 +20,7 @@ sequenceDiagram
 ```
 
 ### 핵심 포인트
-1.  **내 맥북이 서버다**: 외부 서버(AWS, DigitalOcean) 없이 내 컴퓨터가 직접 서비스를 제공합니다.
+1.  **내 집이 서버다**: 외부 서버(AWS, DigitalOcean) 없이 내 컴퓨터가 직접 서비스를 제공합니다.
 2.  **구멍낼 필요 없다**: 공유기 포트포워딩이나 방화벽 해제가 필요 없습니다. `cloudflared`가 안에서 밖으로 안전한 길(Tunnel)을 뚫기 때문입니다.
 3.  **IP 노출 없음**: 내 집 IP가 전 세계에 노출되지 않고, Cloudflare IP만 보입니다. (보안 👍)
 
@@ -35,7 +35,7 @@ cloudflared tunnel run deviltown
 ```
 
 ### 2. 백그라운드 실행 (창 꺼도 유지)
-맥북이 켜져 있는 한 계속 돌아가게 하려면 서비스로 등록해야 합니다.
+PC가 켜져 있는 한 계속 돌아가게 하려면 서비스로 등록해야 합니다.
 
 ```bash
 # 서비스 설치
@@ -54,6 +54,31 @@ sudo launchctl list | grep cloudflared
 nano ~/.cloudflared/config.yml
 ```
 수정 후엔 반드시 **재시작**해야 적용됩니다.
+
+---
+
+## 🖥️ Windows 터널 관리 (For Home Server)
+
+Windows 미니 PC에서 터널을 관리하는 명령어입니다.
+
+### 1. 서비스 상태 확인
+```powershell
+Get-Service cloudflared
+```
+
+### 2. 터널 재시작 (설정 변경 후)
+config.yml을 수정한 경우 서비스를 재시작해야 합니다.
+```powershell
+Stop-Service cloudflared
+Start-Service cloudflared
+```
+
+### 3. Cloudflared 업데이트
+최신 버전으로 업데이트하려면:
+```powershell
+winget upgrade Cloudflare.cloudflared
+```
+업데이트 후 서비스를 재시작해주세요.
 
 ---
 
@@ -84,13 +109,13 @@ nano ~/.cloudflared/config.yml
 ## 🚨 트러블슈팅 (문제 해결)
 
 ### Q. 사이트가 안 들어가져요! (502 Bad Gateway)
-1.  **내 맥북의 서버가 켜져 있나?**: `python main.py`가 실행 중인지 확인하세요.
+1.  **내 PC의 서버가 켜져 있나?**: `python main.py`가 실행 중인지 확인하세요.
 2.  **터널이 켜져 있나?**: `cloudflared tunnel run deviltown`이 실행 중인지 확인하세요.
 3.  **포트가 맞나?**: `config.yml`에 `localhost:8000`이 맞는지 확인하세요.
 
-### Q. 맥북 덮개를 닫으면 꺼져요!
-- 맥북 설정 > 배터리/에너지 절약 > "디스플레이가 꺼져도 잠들지 않음" 체크
-- 또는 **Amphetamine** 앱(무료) 설치해서 "무한 깨어있기" 설정
+### Q. PC가 꺼지지 않게 하려면?
+- **Windows**: 전원 옵션 > 절전 모드 해제
+- **Mac**: 설정 > 디스플레이 > "디스플레이가 꺼져도 잠들지 않음" 체크
 
 ### Q. 터널이 자꾸 끊겨요!
 - 와이파이가 불안정하면 그럴 수 있습니다. 가능하면 **유선 랜**을 꽂거나 와이파이 신호가 강한 곳에 두세요.

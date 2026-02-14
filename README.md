@@ -79,7 +79,7 @@ python main.py
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
 - **Backend**: Python, FastAPI
 - **AI**: Google Gemini API
-- **Deployment**: Local Server (Mac) + Cloudflare Tunnel
+- **Deployment**: Home Server (Windows) + Cloudflare Tunnel
 - **Server**: Uvicorn (ASGI)
 
 ## 🔒 보안
