@@ -1,3 +1,10 @@
+/**
+ * Devil Town Core Script (script.js)
+ * 역할: 매트릭스 애니메이션, 메뉴 네비게이션, 인스타그램 캐러셀, 스케줄 관리 로직 담당
+ * 호출 관계: index.html에서 로드되어 UI 인터랙션을 처리함
+ * 수정 시 주의사항: 성능 최적화를 위해 불필요한 DOM 조작 지양, 리팩토링 시 DRY 원칙 준수
+ */
+
 /* ===== Noise ===== */
 let backgroundMode = "digitalRain"; // "digitalRain" or "noiseFade"
 let enableSuckIn = false;

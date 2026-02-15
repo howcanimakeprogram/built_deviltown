@@ -1,5 +1,12 @@
 /* ===== Devil Coach Gemini Integration (Merged) ===== */
 
+/**
+ * Devil Coach Chat Integration (devil_coach_chat.js)
+ * 역할: AI 코치(Gemini)와의 실시간 채팅 인터페이스 및 메시지 처리 담당
+ * 호출 관계: index.html에서 로드되어 Backend(/chat)와 통신함
+ * 수정 시 주의사항: 대화 히스토리 관리 논리 및 메시지 세척(sanitize) 규칙 준수
+ */
+
 const coachInput = document.getElementById('coachInput');
 const coachSendBtn = document.getElementById('coachSendBtn');
 const coachChatMessages = document.getElementById('coachChatMessages');

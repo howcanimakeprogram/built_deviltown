@@ -1,3 +1,10 @@
+/**
+ * Devil Town Main Stylesheet (style.css)
+ * 역할: 전체 웹사이트의 사이버펑크 테마 및 반응형 레이아웃 디자인 담당
+ * 호출 관계: index.html에서 직접 참조됨
+ * 수정 시 주의사항: 일관된 색상 팔레트 유지 및 모바일 미디어 쿼리 우선순위 주의
+ */
+
 html,
 body {
   margin: 0;
