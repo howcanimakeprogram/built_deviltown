@@ -14,23 +14,43 @@ const coachLoading = document.getElementById('coachLoading');
 
 let chatHistory = [];
 
+async function buildApiErrorMessage(response, defaultMessage) {
+    const retryAfter = response.headers.get('Retry-After');
+    const status = response.status;
+    let detail = '';
+    try {
+        const payload = await response.json();
+        if (payload && typeof payload.detail === 'string') {
+            detail = payload.detail;
+        }
+    } catch (_) {
+        // ignore json parse errors and use fallback message
+    }
+
+    if (status === 429) {
+        const waitText = retryAfter ? `${retryAfter}초` : '잠시';
+        return detail || `요청이 너무 많다. ${waitText} 후 다시 시도하거나 새로고침해라.`;
+    }
+
+    if (status >= 500) {
+        return '지금 서버가 잠깐 불안정하다. 잠시 후 다시 시도해라.';
+    }
+
+    if (status === 413) {
+        return detail || '메시지가 너무 길다. 조금 짧게 보내라.';
+    }
+
+    if (status === 400) {
+        return detail || '요청 형식이 잘못됐다. 다시 입력해라.';
+    }
+
+    return detail || defaultMessage;
+}
+
 // Add message to chat
 function addCoachMessage(content, isUser = false) {
     const messageDiv = document.createElement('div');
     messageDiv.className = isUser ? 'user-message' : 'coach-message';
-    messageDiv.style.cssText = `
-        background: ${isUser ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #ff0000 0%, #cc0000 100%)'};
-        padding: 12px 15px;
-        border-radius: 10px;
-        max-width: 80%;
-        align-self: ${isUser ? 'flex-end' : 'flex-start'};
-        animation: fadeIn 0.3s ease-in;
-        color: #fff;
-        line-height: 1.5;
-        font-size: 14px;
-        word-break: break-word;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    `;
     messageDiv.textContent = content;
 
     coachChatMessages.appendChild(messageDiv);
@@ -60,7 +80,13 @@ async function sendCoachMessage() {
             })
         });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            const errorMessage = await buildApiErrorMessage(
+                response,
+                `HTTP error! status: ${response.status}`
+            );
+            throw new Error(errorMessage);
+        }
 
         const data = await response.json();
         let cleanResponse = data.response;

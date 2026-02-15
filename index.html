@@ -1,7 +1,7 @@
 <!--
 Devil Town Main Homepage (index.html)
 역할: 사이트의 전반적인 구조와 디자인(메인 테마, 메뉴, 섹션)을 담당
-호출 관계: main.py(Server) -> index.html (Client) -> script.js/css
+호출 관계: main.py(Server) -> index.html (Client) -> 분리된 js/*.js + css
 수정 시 주의사항: .agent/rules/에 정의된 코딩 표준 및 문서 스타일 준수 필요
 -->
 <!DOCTYPE html>
@@ -11,7 +11,7 @@ Devil Town Main Homepage (index.html)
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DEVILTOWN</title>
-  <link rel="stylesheet" href="css/style.css?v=2.5">
+  <link rel="stylesheet" href="css/style.css?v=3.6">
 </head>
 
 <body>
@@ -19,75 +19,54 @@ Devil Town Main Homepage (index.html)
   <canvas id="noise"></canvas>
 
   <!-- Entrance Gate (Devil 666 - User's Original Design) -->
-  <div id="gateOverlay" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 9999;
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f6f7f9;
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  ">
-    <div style="width: 90%; max-width: 900px;">
-      <h1 style="font-size: 48px; font-weight: 500; margin-bottom: 10px;">
+  <div id="gateOverlay">
+    <div class="gate-container">
+      <h1 class="gate-title">
         Bad gateway
-        <span
-          style="display: inline-block; background: #eee; padding: 6px 12px; border-radius: 20px; font-size: 14px; margin-left: 10px; vertical-align: middle;">Error
+        <span class="error-badge">Error
           code 666</span>
       </h1>
 
-      <div style="display: flex; justify-content: space-between; margin: 40px 0; gap: 20px; flex-wrap: wrap;">
-        <div
-          style="flex: 1; min-width: 200px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-          <div style="font-size: 30px; margin-bottom: 10px;">🖥️</div>
-          <div>Browser</div>
-          <div style="color: #2ecc71; font-weight: 600;">Working</div>
+      <div class="status-row">
+        <div class="status-box">
+          <div class="status-icon">🖥️</div>
+          <div class="status-label">Browser</div>
+          <div class="status-state working">Working</div>
         </div>
 
-        <div
-          style="flex: 1; min-width: 200px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-          <div style="font-size: 30px; margin-bottom: 10px;">☁️</div>
-          <div>Hellfire Gateway</div>
-          <div style="color: #2ecc71; font-weight: 600;">Working</div>
+        <div class="status-box">
+          <div class="status-icon">☁️</div>
+          <div class="status-label">Hellfire Gateway</div>
+          <div class="status-state working">Working</div>
         </div>
 
-        <div
-          style="flex: 1; min-width: 200px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-          <div style="font-size: 30px; margin-bottom: 10px;">🖥️</div>
-          <div>Host</div>
-          <div style="color: #e74c3c; font-weight: 600;">Summoning...</div>
+        <div class="status-box">
+          <div class="status-icon">🖥️</div>
+          <div class="status-label">Host</div>
+          <div class="status-state error">Summoning...</div>
         </div>
       </div>
 
-      <div style="margin-top: 30px;">
+      <div class="info-section">
         <h2>What happened?</h2>
         <p>The underworld server is testing your identity.</p>
       </div>
 
-      <div style="margin-top: 30px;">
+      <div class="info-section">
         <h2>What can I do?</h2>
         <p>If you are a devil, confirm below.</p>
       </div>
 
-      <div
-        style="margin-top: 30px; padding: 20px; border: 3px solid black; border-radius: 50px; display: inline-block;">
-        <label>
-          <input type="checkbox" id="devilCheck">
+      <div class="devil-checkpoint">
+        <label class="devil-label">
+          <input type="checkbox" id="devilCheck" class="devil-checkbox">
           If you are a devil, check this box and press Enter.
         </label>
         <br>
-        <button id="enterBtn"
-          style="margin-top: 20px; padding: 10px 25px; font-size: 16px; border: none; background: black; color: white; border-radius: 6px; cursor: pointer;">Enter</button>
+        <button id="enterBtn" class="devil-btn">Enter</button>
       </div>
 
-      <div style="margin-top: 40px; font-size: 12px; color: #888;">
+      <div class="gate-footer">
         Hellfire Ray ID: <span id="rayId">666-DEVIL-001</span><br>
         Your Soul ID: ********
       </div>
@@ -124,7 +103,7 @@ Devil Town Main Homepage (index.html)
   <button id="menuBtn" class="menu-btn" aria-label="Open menu" aria-expanded="false">MENU</button>
   <div id="menuOverlay" class="menu-overlay" hidden></div>
 
-  <aside id="menuPanel" class="menu-panel" aria-hidden="true">
+  <aside id="menuPanel" class="menu-panel" role="dialog" aria-modal="true" aria-label="Site menu" aria-hidden="true">
     <div class="menu-header">
       <div class="menu-title">DEVILTOWN</div>
       <button id="menuClose" class="menu-close" aria-label="Close menu">✕</button>
@@ -136,7 +115,7 @@ Devil Town Main Homepage (index.html)
       <button class="menu-item" data-key="archive">Archive (Photo/Video)</button>
       <button class="menu-item" data-key="mixes">Mixes</button>
       <button class="menu-item" data-key="marathoner">Marathoner</button>
-      <button class="menu-item" data-key="skullgame">🎲 SKULL Dice</button>
+      <button class="menu-item" data-key="skullgame">🎲 Skull DIce</button>
       <button class="menu-item" data-key="devilcoach">Devil Coach (AI)</button>
     </nav>
 
@@ -177,76 +156,32 @@ Devil Town Main Homepage (index.html)
   </div>
 
   <!-- Page container (overlay panel) -->
-  <section id="content" aria-hidden="true">
+  <section id="content" role="dialog" aria-modal="true" aria-labelledby="contentTitle" aria-hidden="true">
     <div class="content-header">
       <div id="contentTitle" class="content-title">DEVILTOWN</div>
       <button id="pageClose" class="content-close" aria-label="Close page">✕</button>
     </div>
 
     <div class="content-body">
-      <div id="sec-wtfis" class="section">
-        <p style="text-align:center; opacity:0.7; font-size:14px; margin-bottom:20px;">로고 / 디자인 파일 / 도안 / 그래픽 실험 / 비주얼
-          작업 아카이브.</p>
-        <div class="grid" style="margin-top:12px;">
-          <div class="card">
-            <div class="thumb">LOGO</div>
-            <div class="small" style="margin-top:10px;">DEVILTOWN logo set</div>
-          </div>
-          <div class="card">
-            <div class="thumb">TEES</div>
-            <div class="small" style="margin-top:10px;">T-shirt graphics</div>
-          </div>
-          <div class="card">
-            <div class="thumb">POSTER</div>
-            <div class="small" style="margin-top:10px;">Posters / Flyers</div>
-          </div>
-        </div>
+      <div id="sec-wtfis" class="section feed-section" data-feed-key="wtfis">
+        <p class="feed-intro">로고 / 티셔츠 / 포스터 / 그래픽 실험 피드</p>
+        <div id="wtfisTagBar" class="feed-tag-bar" hidden></div>
+        <div id="wtfisFeed" class="feed-list" aria-live="polite"></div>
+        <div id="wtfisEmpty" class="feed-empty" hidden>표시할 그래픽 항목이 없습니다.</div>
       </div>
 
       <!-- SKULL Dice Section -->
       <div id="sec-skullgame" class="section">
-        <div class="game-box" style="
-          margin: 10px 0; 
-          padding: 60px 20px; 
-          border: 1px dashed rgba(255,100,100,0.3); 
-          background: rgba(20,0,0,0.3); 
-          text-align: center;
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          gap: 40px;
-        ">
+        <div class="game-box">
           <!-- Button is now the main focus; results pop up at the very top of the screen -->
-          <button id="skullGameBtn" class="btn" style="
-            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%); 
-            border: none; 
-            font-size: 20px; 
-            padding: 20px 45px;
-            border-radius: 50px;
-            font-weight: 900;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(255,0,0,0.4);
-            z-index: 101;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          ">
+          <button id="skullGameBtn" class="btn skull-game-btn">
             ROLL THE SKULL DICE 🎲
           </button>
 
           <!-- Result appears here below the button -->
-          <div id="miniGameResult" style="
-            width: 100%;
-            min-height: 150px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            z-index: 100;
-          "></div>
+          <div id="miniGameResult" class="mini-game-result"></div>
 
-          <div style="font-size: 13px; color: #888; font-family: monospace; letter-spacing: 1px; opacity:0.8;">
+          <div class="skull-chance">
             (CHANCE: 0km : 1% | 30km : 5% | Full : 1%)
           </div>
         </div>
@@ -258,189 +193,52 @@ Devil Town Main Homepage (index.html)
           차리게 해드립니다.</p>
 
         <!-- Chat Interface -->
-        <div class="coach-chat-container" style="
-          margin-top: 20px;
-          background: rgba(0,0,0,0.5);
-          border: 1px solid rgba(255,0,0,0.3);
-          border-radius: 10px;
-          overflow: hidden;
-        ">
-          <div id="coachChatMessages" style="
-            height: 400px;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-          ">
-            <div class="coach-message" style="
-              background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
-              padding: 12px 15px;
-              border-radius: 10px;
-              max-width: 80%;
-              align-self: flex-start;
-              color: #fff;
-              line-height: 1.5;
-              font-size: 14px;
-            ">
+        <div class="coach-chat-container">
+          <div id="coachChatMessages" class="coach-chat-messages">
+            <div class="coach-message">
               야 새끼야, 뭐 물어볼 거 있냐? 뛰기 싫다고 징징대지 말고 질문이나 해라 ㅋㅋ
             </div>
           </div>
 
-          <div style="
-            padding: 15px;
-            background: rgba(30,30,30,0.8);
-            border-top: 1px solid rgba(255,0,0,0.3);
-            display: flex;
-            gap: 10px;
-          ">
-            <input type="text" id="coachInput" placeholder="여기다 쳐봐... (예: 오늘 10km 뛰려는데 준비운동 뭐해?)" style="
-                flex: 1;
-                padding: 12px 15px;
-                background: rgba(20,20,20,0.9);
-                border: 1px solid rgba(255,0,0,0.3);
-                border-radius: 20px;
-                color: #fff;
-                font-size: 14px;
-                outline: none;
-              " />
-            <button id="coachSendBtn" class="btn" style="
-              padding: 12px 25px;
-              background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
-              border: none;
-              border-radius: 20px;
-              font-weight: bold;
-              cursor: pointer;
-            ">
+          <div class="coach-chat-input-row">
+            <input type="text" id="coachInput" class="coach-input" placeholder="여기다 쳐봐... (예: 오늘 10km 뛰려는데 준비운동 뭐해?)" />
+            <button id="coachSendBtn" class="btn coach-send-btn">
               보내기
             </button>
           </div>
         </div>
 
-        <div id="coachLoading" style="
-          display: none;
-          text-align: center;
-          margin-top: 10px;
-          font-size: 12px;
-          opacity: 0.7;
-        ">
+        <div id="coachLoading" class="coach-loading">
           <span>코치가 답변 준비 중...</span>
         </div>
       </div>
 
-      <div id="sec-schedule" class="section">
-        <p style="text-align:center; opacity:0.7; font-size:14px; margin-bottom:20px;">레이스 / 트래블 / 이벤트 공유 캘린더</p>
-
-        <div class="card" style="margin-top:20px; text-align:center; padding: 20px;">
-          <div style="font-size:14px; margin-bottom:15px; opacity:0.8;">
-            <p>모든 일정은 iCloud 캘린더로 관리됩니다.</p>
-            <p>아래 버튼을 눌러 구독하세요.</p>
-          </div>
-          <a class="btn" target="_blank"
-            href="webcal://p44-caldav.icloud.com/published/2/NDE4ODE1NjY2NDE4ODE1NqDjLwq8GMN_zupBHSe0DAmmz8VvM5LEnkcLBL298CvgpMqp9UnWVYdyl0KkEr3T51GFC-uIzKH_pnozZxt_HFc"
-            style="display:inline-block; margin:0 auto;">
-            📅 iCloud Calendar 구독
-          </a>
-        </div>
+      <div id="sec-schedule" class="section feed-section" data-feed-key="schedule">
+        <p class="feed-intro">iCloud 캘린더 일정 타임라인</p>
+        <div id="scheduleTagBar" class="feed-tag-bar" hidden></div>
+        <div id="scheduleFeed" class="feed-list schedule-feed" aria-live="polite"></div>
+        <div id="scheduleEmpty" class="feed-empty" hidden>일정을 불러오지 못했습니다.</div>
       </div>
 
-      <div id="sec-archive" class="section">
-        <p style="text-align:center; opacity:0.7; font-size:14px; margin-bottom:20px;">포토 / 비디오 아카이브 (비디오는 유튜브 업로드 예정)
-        </p>
-
-        <div class="grid" style="margin-top:12px;">
-          <div class="card">
-            <div class="thumb">PHOTO</div>
-            <div class="small" style="margin-top:10px;">2nd anniversary</div>
-          </div>
-
-          <div class="card">
-            <button class="playlist-open" data-title="ĐɆVłⱠ₮Ø₩₦ ⱤɆ₳ĐɎ 2 ĐⱤł₦₭"
-              data-videos="o2_g_GyF1iE,TzyiGAERKVw,vbeBVo2jiRY,_7P7_9RgDQM,vbeBVo2jiRY,w35YjgOUaZk"
-              data-titles="CHBS,tejava_assassins,VIC_CATLE,FAACIA,TENJU,mhmd"
-              data-instagrams="https://www.instagram.com/givemeazerocoke/,https://www.instagram.com/tejava_assassins/,https://www.instagram.com/vic_catle/,https://www.instagram.com/faacia.or0/,https://www.instagram.com/tenjumakes/,https://www.instagram.com/mhmd_muhammmmmad/">
-              <div class="thumb">VIDEO</div>
-              <div class="small" style="margin-top:10px;">
-                ĐɆVłⱠ₮Ø₩₦ ⱤɆ₳ĐɆ 2 ĐⱤł₦₭ ▶
-              </div>
-            </button>
-          </div>
-
-          <div class="card">
-            <div class="thumb">DESIGN</div>
-            <div class="small" style="margin-top:10px;">Artwork archive</div>
-          </div>
-
-          <div class="card">
-            <div class="thumb">PHOTO</div>
-            <div class="small" style="margin-top:10px;">Album placeholder</div>
-          </div>
-
-          <div class="card">
-            <div class="thumb">VIDEO</div>
-            <div class="small" style="margin-top:10px;">Playlist placeholder</div>
-          </div>
-
-          <div class="card">
-            <div class="thumb">DESIGN</div>
-            <div class="small" style="margin-top:10px;">Archive placeholder</div>
-          </div>
-        </div>
+      <div id="sec-archive" class="section feed-section" data-feed-key="archive">
+        <p class="feed-intro">포토 / 비디오 / 그래픽 카드 피드</p>
+        <div id="archiveTagBar" class="feed-tag-bar" hidden></div>
+        <div id="archiveFeed" class="feed-list feed-grid" aria-live="polite"></div>
+        <div id="archiveEmpty" class="feed-empty" hidden>해당 태그에 맞는 항목이 없습니다.</div>
       </div>
 
-      <div id="sec-mixes" class="section">
-        <p style="text-align:center; opacity:0.7; font-size:14px; margin-bottom:20px;">믹스셋 업로드 방식 확정되면 여기에 연결.</p>
-        <div class="grid" style="margin-top:12px;">
-          <div class="card">
-            <div class="thumb">MIX #1</div>
-            <div class="small" style="margin-top:10px;">placeholder</div>
-          </div>
-          <div class="card">
-            <div class="thumb">MIX #2</div>
-            <div class="small" style="margin-top:10px;">placeholder</div>
-          </div>
-          <div class="card">
-            <div class="thumb">MIX #3</div>
-            <div class="small" style="margin-top:10px;">placeholder</div>
-          </div>
-        </div>
+      <div id="sec-mixes" class="section feed-section" data-feed-key="mixes">
+        <p class="feed-intro">믹스셋 피드 (태그 필터 + 플랫폼 정보)</p>
+        <div id="mixesTagBar" class="feed-tag-bar" hidden></div>
+        <div id="mixesFeed" class="feed-list" aria-live="polite"></div>
+        <div id="mixesEmpty" class="feed-empty" hidden>해당 태그에 맞는 믹스가 없습니다.</div>
       </div>
 
-      <div id="sec-marathoner" class="section">
-        <p style="text-align:center; opacity:0.7; font-size:14px; margin-bottom:20px;">러닝 기록 + 사진 + 이력 (일단 사진은 아스키 해골로
-          대체)</p>
-
-        <div class="run-grid" style="margin-top:12px;">
-          <div class="card">
-            <div><b>Race #1</b> · 42.195K · 00:00:00</div>
-            <div class="small">YYYY-MM-DD · Location</div>
-            <div class="run-photo">
-              <pre class="runSkull"></pre>
-            </div>
-          </div>
-          <div class="card">
-            <div><b>Race #2</b> · 21.1K · 00:00:00</div>
-            <div class="small">YYYY-MM-DD · Location</div>
-            <div class="run-photo">
-              <pre class="runSkull"></pre>
-            </div>
-          </div>
-          <div class="card">
-
-            <div><b>Race #3</b> · 10K · 00:00:00</div>
-            <div class="small">YYYY-MM-DD · Location</div>
-            <div class="run-photo">
-              <pre class="runSkull"></pre>
-            </div>
-          </div>
-          <div class="card">
-            <div><b>Race #4</b> · Trail · 00:00:00</div>
-            <div class="small">YYYY-MM-DD · Location</div>
-            <div class="run-photo">
-              <pre class="runSkull"></pre>
-            </div>
-          </div>
-        </div>
+      <div id="sec-marathoner" class="section feed-section" data-feed-key="marathoner">
+        <p class="feed-intro">러닝 로그 피드 (거리 / 페이스 / 루트 / 컨디션)</p>
+        <div id="marathonerTagBar" class="feed-tag-bar" hidden></div>
+        <div id="marathonerFeed" class="feed-list" aria-live="polite"></div>
+        <div id="marathonerEmpty" class="feed-empty" hidden>해당 태그 러닝 기록이 없습니다.</div>
       </div>
 
     </div>
@@ -448,8 +246,11 @@ Devil Town Main Homepage (index.html)
 
   <!-- Imports -->
   <!-- Main Scripts -->
-  <script src="js/script.js?v=2.0"></script>
-  <script src="js/devil_coach_chat.js?v=2.0"></script>
+  <script src="js/visuals.js?v=3.7"></script>
+  <script src="js/navigation_feeds.js?v=3.7"></script>
+  <script src="js/game_video.js?v=3.7"></script>
+  <script src="js/boot_gate.js?v=3.7"></script>
+  <script src="js/devil_coach_chat.js?v=3.7"></script>
 </body>
 
 </html>
