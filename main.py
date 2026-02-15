@@ -143,6 +143,12 @@ async def dice_comment_endpoint(request: DiceCommentRequest):
 
 @app.get("/")
 async def read_root():
+    """
+    루트 경로 요청 시 index.html 반환.
+    
+    Returns:
+        FileResponse: index.html 파일
+    """
     logger.info("Serving index.html")
     return FileResponse("index.html")
 
