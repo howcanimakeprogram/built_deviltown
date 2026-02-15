@@ -541,7 +541,7 @@ async def chat_endpoint(request_data: Request, chat_req: ChatRequest):
         
         system_instruction = get_system_prompt()
         model = genai.GenerativeModel(
-            model_name="gemini-1.5-flash",
+            model_name="gemini-2.5-flash",
             generation_config=generation_config,
             system_instruction=system_instruction,
         )
@@ -585,7 +585,7 @@ async def dice_comment_endpoint(request_data: Request, dice_req: DiceCommentRequ
     
     try:
         genai.configure(api_key=API_KEY)
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-2.5-flash")
         
         prompt = (
             f"너는 'Devil Coach'라는 아주 무례하고 독설을 내뱉는 방구석 여포 겸 코치다. "
