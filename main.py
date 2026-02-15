@@ -93,7 +93,7 @@ async def chat_endpoint(request: ChatRequest):
         
         system_instruction = get_system_prompt()
         model = genai.GenerativeModel(
-            model_name="gemini-flash-lite-latest",
+            model_name="gemini-2.0-flash",
             generation_config=generation_config,
             system_instruction=system_instruction,
         )
@@ -119,7 +119,7 @@ async def dice_comment_endpoint(request: DiceCommentRequest):
     
     try:
         genai.configure(api_key=API_KEY)
-        model = genai.GenerativeModel("gemini-flash-lite-latest")
+        model = genai.GenerativeModel("gemini-2.0-flash")
         
         prompt = (
             f"너는 'Devil Coach'라는 아주 무례하고 독설을 내뱉는 악마 코치다. "
@@ -138,7 +138,8 @@ async def dice_comment_endpoint(request: DiceCommentRequest):
         return {"comment": comment}
     except Exception as e:
         logger.error(f"Error in dice_comment: {str(e)}")
-        return {"comment": f"{request.distance} 당장 뛰어! 지옥이 기다린다."}
+        # Temporary: Return error to frontend for debugging
+        return {"comment": f"오류 발생: {str(e)}"}
 
 @app.get("/")
 async def read_root():

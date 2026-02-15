@@ -93,7 +93,7 @@ pip install -r requirements.txt
 cd "D:\DEVILTOWN"
 pip install -r requirements.txt
 # 또는 PowerShell 스크립트 실행
-# .\SETUP_ENV.ps1
+# .\setup_env.ps1
 ```
 
 **설치되는 패키지**:

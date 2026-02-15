@@ -27,19 +27,14 @@ GOOGLE_API_KEY=your_api_key_here
 API 키는 [Google AI Studio](https://aistudio.google.com/)에서 발급받을 수 있습니다.
 
 ### 3. 서버 실행
+단일 명령어로 프론트엔드와 백엔드가 모두 실행됩니다:
 
-**프론트엔드 서버** (포트 8999):
-```bash
-python3 -m http.server 8999
-```
-
-**백엔드 API 서버** (포트 8000):
 ```bash
 python main.py
 ```
 
 ### 4. 접속
-브라우저에서 `http://127.0.0.1:8999` 접속
+브라우저에서 `http://localhost:8000` 접속
 
 ## 📁 프로젝트 구조
 

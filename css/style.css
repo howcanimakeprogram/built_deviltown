@@ -397,7 +397,8 @@ body.page-open #content {
 /* Archive thumbnails */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* 변경: 150px 이하로 좁아지면 자동으로 다음 줄로 넘김 */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
 }
 
@@ -423,6 +424,7 @@ body.page-open #content {
   background: rgba(255, 255, 255, 0.04);
   padding: 12px;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
+  word-break: break-word;
 }
 
 .thumb {
@@ -470,6 +472,9 @@ body.page-open #content {
 .small {
   font-size: 12px;
   opacity: 0.8;
+  white-space: normal;
+  word-break: break-all;
+  line-height: 1.4;
 }
 
 /* ===== Playlist (Modal) helpers ===== */
@@ -608,12 +613,20 @@ body.video-open #videoModal {
 }
 
 @media (max-width: 800px) {
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.85);
+    /* 배경을 진하게 하여 본문과 겹쳐도 보이게 */
+  }
+
+  /* 화면 밖이 아닌 안쪽(5px)으로 위치 이동 */
   .nav-btn.prev {
-    left: -10px;
+    left: 5px;
   }
 
   .nav-btn.next {
-    right: -10px;
+    right: 5px;
   }
 }
 

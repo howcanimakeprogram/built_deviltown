@@ -2,7 +2,8 @@
 
 try {
     # Set GOOGLE_API_KEY globally
-    [System.Environment]::SetEnvironmentVariable('GOOGLE_API_KEY', 'AIzaSyBFYF0NCwi_pG-kbIRxIIX14quL_fgovl0', 'Machine')
+    $apiKey = Read-Host -Prompt "Enter your GOOGLE_API_KEY"
+    [System.Environment]::SetEnvironmentVariable('GOOGLE_API_KEY', $apiKey, 'Machine')
     Write-Host "✅ GOOGLE_API_KEY set globally." -ForegroundColor Green
 
     # Add Python to global PATH if not present

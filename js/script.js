@@ -291,7 +291,9 @@ async function finalizeGameResult(target) {
 
   target.innerHTML = `
     <div style="font-size: 4rem; font-weight: 900; color: #ff0000; text-shadow: 0 0 20px rgba(255,0,0,0.6); line-height: 1; margin: 0;">${distance}</div>
-    <div id="diceComment" style="font-size: 1.1rem; color: #fff; font-weight: bold; margin-top: 15px; text-align: center; opacity: 0.8;">악마가 코멘트를 작성 중...</div>
+    <div id="diceComment" style="font-size: 1.1rem; color: #fff; font-weight: bold; margin-top: 15px; text-align: center; opacity: 0.8;">
+      <span class="blink">악마가 코멘트를 생각하는 중...</span>
+    </div>
   `;
 
   try {
@@ -300,6 +302,11 @@ async function finalizeGameResult(target) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ distance: distance })
     });
+
+    if (!response.ok) {
+      throw new Error(`Server error: ${response.status}`);
+    }
+
     const data = await response.json();
     const commentEl = document.getElementById("diceComment");
     if (commentEl) {
@@ -309,7 +316,7 @@ async function finalizeGameResult(target) {
   } catch (err) {
     console.error("Dice comment error:", err);
     const commentEl = document.getElementById("diceComment");
-    if (commentEl) commentEl.textContent = "당장 뛰어! 지옥이 기다린다.";
+    if (commentEl) commentEl.textContent = "당장 뛰어! 지옥이 기다린다. (API 오류)";
   }
 
   isRolling = false;
