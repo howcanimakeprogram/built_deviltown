@@ -1,26 +1,26 @@
-# Changelog
+# 변경 이력 (Changelog)
 
-All notable changes to this project will be documented in this file.
+이 프로젝트의 모든 주요 변경 사항은 이 파일에 기록됩니다.
 
 ## [Unreleased]
 
 ## [1.1.0] - 2026-02-15
-### Added
-- **Responsive Layout**: Applied `auto-fit` grid system and text wrapping for better mobile experience.
-- **Secure Setup**: Added `setup_env.ps1` for secure API key injection on Windows.
-- **New Persona**: Updated AI Coach persona to "Bang-guseok Yeopo" (Room Corner Lu Bu).
+### 추가됨 (Added)
+- **반응형 레이아웃**: 모바일 환경에서도 잘 보이도록 `auto-fit` 그리드 시스템과 텍스트 줄바꿈 적용.
+- **보안 설정 스크립트**: 윈도우에서 API 키를 안전하게 등록할 수 있는 `setup_env.ps1` 추가.
+- **새로운 페르소나**: AI 코치 스타일을 "방구석 여포(입만 산 키보드 워리어)"로 변경.
 
-### Changed
-- **AI Model**: Upgraded from `gemini-1.5-flash` to `gemini-2.0-flash` to resolve API errors.
-- **Documentation**: Updated `README.md` and `SYSTEM_DOCS.md` with new deployment instructions and persona details.
-- **API Key Handling**: Removed hardcoded API key from source code; now uses environment variables only.
+### 변경됨 (Changed)
+- **AI 모델 업그레이드**: API 오류 해결을 위해 `gemini-1.5-flash`에서 `gemini-2.0-flash`로 버전 변경.
+- **문서 현행화**: `README.md`와 `SYSTEM_DOCS.md`에 최신 배포 방법 및 페르소나 변경 사항 반영.
+- **API 키 관리 방식**: 소스 코드에 하드코딩된 API 키 제거 및 환경 변수(`GOOGLE_API_KEY`) 사용으로 변경.
 
-### Fixed
-- **Mobile UI**: Fixed button overlap and text clipping issues on small screens.
-- **Windows Deployment**: Resolved `WinError 10048` (Port Conflict) and `ModuleNotFoundError`.
-- **API Security**: Prevented API key leakage by adding `.env` and `setup_env.ps1` to `.gitignore`.
+### 수정됨 (Fixed)
+- **모바일 UI 오류**: 작은 화면에서 버튼이 겹치거나 텍스트가 잘리는 문제 해결.
+- **윈도우 배포 오류**: `WinError 10048` (포트 충돌) 및 `ModuleNotFoundError` 해결.
+- **보안 취약점**: `.env` 및 `setup_env.ps1`을 `.gitignore`에 추가하여 API 키 유출 방지.
 
 ## [1.0.0] - 2026-02-14
-### Added
-- Initial release of Devil Town Running Coach website.
-- Features: Skull Dice Game, AI Coach Chat, Schedule, Archive, Mixes.
+### 추가됨 (Added)
+- Devil Town 러닝 코치 웹사이트 최초 릴리즈.
+- 주요 기능: 해골 주사위 게임(Skull Game), AI 코치 채팅, 스케줄 관리, 아카이브, 믹스셋.
