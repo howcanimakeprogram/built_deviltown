@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DEVILTOWN</title>
-  <link rel="stylesheet" href="css/style.css?v=2.2">
+  <link rel="stylesheet" href="css/style.css?v=2.5">
 </head>
 
 <body>
@@ -358,6 +358,59 @@
             <div class="small">YYYY-MM-DD · Location</div>
             <div class="run-photo">
               <pre class="runSkull"></pre>
+            </div>
+          </div>
+          <!-- Entrance Gate (Devil 666 - Simple Version) -->
+          <div id="gateOverlay">
+            <div class="gate-container">
+              <h1>
+                Bad gateway
+                <span class="error-badge">Error code 666</span>
+              </h1>
+
+              <div class="status-row">
+                <div class="status-box">
+                  <div class="status-icon">🖥️</div>
+                  <div class="status-label">Browser</div>
+                  <div class="status-state working">Working</div>
+                </div>
+
+                <div class="status-box">
+                  <div class="status-icon">☁️</div>
+                  <div class="status-label">Hellfire Gateway</div>
+                  <div class="status-state working">Working</div>
+                </div>
+
+                <div class="status-box">
+                  <div class="status-icon">🖥️</div>
+                  <div class="status-label">Host</div>
+                  <div class="status-state error">Summoning...</div>
+                </div>
+              </div>
+
+              <div class="info-section">
+                <h2>What happened?</h2>
+                <p>The underworld server is testing your identity.</p>
+              </div>
+
+              <div class="info-section">
+                <h2>What can I do?</h2>
+                <p>If you are a devil, confirm below.</p>
+              </div>
+
+              <div class="devil-checkpoint">
+                <label class="devil-label">
+                  <input type="checkbox" id="devilCheck" class="devil-checkbox">
+                  <span>If you are a devil, check this box and press Enter.</span>
+                </label>
+                <br>
+                <button id="enterBtn" class="devil-btn">Enter</button>
+              </div>
+
+              <div class="gate-footer">
+                Hellfire Ray ID: <span id="rayId"></span><br>
+                Your Soul ID: ********
+              </div>
             </div>
           </div>
           <div class="card">

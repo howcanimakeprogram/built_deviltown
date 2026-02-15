@@ -665,7 +665,7 @@ body.video-open #videoModal {
   font-weight: bold;
 }
 
-/* ===== Entrance Gate (Matrix/Cyberpunk Style) ===== */
+/* ===== Entrance Gate (Simple 666 Design) ===== */
 #gateOverlay {
   position: fixed;
   top: 0;
@@ -673,134 +673,145 @@ body.video-open #videoModal {
   width: 100vw;
   height: 100vh;
   z-index: 9999;
-  background-color: #000;
-  /* Fallback */
-  background: rgba(0, 0, 0, 0.95);
+  background: #f6f7f9;
+  color: #333;
   display: flex !important;
-  /* Force display */
   justify-content: center;
   align-items: center;
   text-align: center;
-  transition: opacity 0.8s ease, transform 0.8s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: opacity 0.6s ease;
 }
 
-.gate-content {
+.gate-container {
+  width: 90%;
+  max-width: 900px;
+}
+
+.gate-container h1 {
+  font-size: 48px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.error-badge {
+  display: inline-block;
+  background: #eee;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.status-row {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 25px;
-  max-width: 90%;
-  animation: gateFloat 4s ease-in-out infinite;
-  border: 1px solid rgba(255, 0, 0, 0.2);
-  padding: 40px;
-  background: rgba(10, 0, 0, 0.8);
-  box-shadow: 0 0 50px rgba(255, 0, 0, 0.1);
+  justify-content: space-between;
+  margin: 40px 0;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-@keyframes gateFloat {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-5px);
-  }
+.status-box {
+  flex: 1;
+  min-width: 200px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.gate-warning {
-  color: #ff0000;
-  font-family: 'Courier New', monospace;
-  font-weight: bold;
-  letter-spacing: 0.3em;
-  font-size: 16px;
-  border: 2px solid #ff0000;
-  padding: 8px 16px;
-  background: rgba(255, 0, 0, 0.15);
-  text-transform: uppercase;
-  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
-  animation: warningBlink 0.2s infinite alternate;
+.status-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
 }
 
-@keyframes warningBlink {
-  0% {
-    opacity: 0.8;
-    box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
-  }
-
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
-  }
+.status-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
 }
 
-.gate-title {
-  font-size: clamp(3rem, 8vw, 6rem);
-  font-weight: 900;
-  color: #fff;
-  text-transform: uppercase;
-  margin: 0;
-  letter-spacing: -2px;
-  text-shadow: 4px 4px 0px #ff0000;
-  font-family: sans-serif;
-  line-height: 1;
+.status-state {
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.gate-desc {
-  color: #ccc;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  font-family: monospace;
+.status-state.working {
+  color: #2ecc71;
 }
 
-/* Kitsch Glitch Button */
-.gate-btn {
-  position: relative;
+.status-state.error {
+  color: #e74c3c;
+}
+
+.info-section {
   margin-top: 30px;
-  background: #000;
-  border: 2px solid #fff;
-  color: #fff;
-  padding: 20px 50px;
-  font-size: 1.2rem;
-  font-weight: 900;
-  text-transform: uppercase;
+}
+
+.info-section h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.info-section p {
+  color: #666;
+  font-size: 15px;
+}
+
+.devil-checkpoint {
+  margin-top: 30px;
+  padding: 20px;
+  border: 3px solid black;
+  border-radius: 50px;
+  display: inline-block;
+}
+
+.devil-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   cursor: pointer;
-  overflow: hidden;
-  transition: all 0.2s;
-  box-shadow: 5px 5px 0px #ff0000;
+  user-select: none;
 }
 
-.gate-btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0px #ff0000;
-  background: #fff;
-  color: #000;
+.devil-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #000;
 }
 
-.gate-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #ff0000;
+.devil-btn {
+  margin-top: 20px;
+  padding: 10px 25px;
+  font-size: 16px;
+  border: none;
+  background: black;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.2s;
 }
 
-.gate-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.4), transparent);
-  transition: 0.5s;
-}
-
-.gate-btn:hover::before {
-  left: 100%;
+.devil-btn:hover {
+  opacity: 0.8;
 }
 
 .gate-footer {
   margin-top: 40px;
-  font-size: 0.8rem;
-  color: #666;
-  font-family: monospace;
+  font-size: 12px;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .status-row {
+    flex-direction: column;
+  }
+
+  .gate-container h1 {
+    font-size: 36px;
+  }
 }

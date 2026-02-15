@@ -636,31 +636,41 @@ rainTargetTextAlpha = 0.34;
 rainClearAlpha = 0.08;
 rainTargetClearAlpha = 0.08;
 
-// Entrance Gate Logic
+// Entrance Gate Logic (Simple 666 Version)
 const gateOverlay = document.getElementById('gateOverlay');
 const enterBtn = document.getElementById('enterBtn');
+const devilCheck = document.getElementById('devilCheck');
+const rayIdDisplay = document.getElementById('rayId');
 
+// Generate Hellfire Ray ID
+if (rayIdDisplay) {
+  rayIdDisplay.textContent = '666-DEVIL-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+}
+
+// Enter button click handler
 if (enterBtn && gateOverlay) {
   enterBtn.addEventListener('click', () => {
-    // 1. Play sound effect (optional/future)
-    // 2. Animate out
-    gateOverlay.style.opacity = '0';
-    gateOverlay.style.transform = 'scale(1.5)';
-    gateOverlay.style.pointerEvents = 'none';
+    if (devilCheck && devilCheck.checked) {
+      // Fade out overlay
+      gateOverlay.style.opacity = '0';
+      gateOverlay.style.pointerEvents = 'none';
 
-    // 3. Start the intro sequence after small delay
-    setTimeout(() => {
-      gateOverlay.style.display = 'none';
-      rainTargetTextAlpha = 0.18;
-      rainTargetClearAlpha = 0.18;
-      play(); // The original start function
-    }, 800);
+      // Start main site intro
+      setTimeout(() => {
+        gateOverlay.style.display = 'none';
+        rainTargetTextAlpha = 0.18;
+        rainTargetClearAlpha = 0.18;
+        play();
+      }, 600);
+    } else {
+      alert('Access denied. Humanity detected.');
+    }
   });
-} else {
-  // Fallback if gate is missing
-  setTimeout(() => {
-    rainTargetTextAlpha = 0.18;
-    rainTargetClearAlpha = 0.18;
-    play();
-  }, 2500);
 }
+
+// Enter key support
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && gateOverlay.style.display !== 'none') {
+    if (enterBtn) enterBtn.click();
+  }
+});
