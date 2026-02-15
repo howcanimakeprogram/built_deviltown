@@ -12,55 +12,77 @@
 
   <canvas id="noise"></canvas>
 
-  <!-- Entrance Gate (Devil 666 - Simple Version) -->
-  <div id="gateOverlay">
-    <div class="gate-container">
-      <h1>
+  <!-- Entrance Gate (Devil 666 - User's Original Design) -->
+  <div id="gateOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f6f7f9;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  ">
+    <div style="width: 90%; max-width: 900px;">
+      <h1 style="font-size: 48px; font-weight: 500; margin-bottom: 10px;">
         Bad gateway
-        <span class="error-badge">Error code 666</span>
+        <span
+          style="display: inline-block; background: #eee; padding: 6px 12px; border-radius: 20px; font-size: 14px; margin-left: 10px; vertical-align: middle;">Error
+          code 666</span>
       </h1>
 
-      <div class="status-row">
-        <div class="status-box">
-          <div class="status-icon">🖥️</div>
-          <div class="status-label">Browser</div>
-          <div class="status-state working">Working</div>
+      <div style="display: flex; justify-content: space-between; margin: 40px 0; gap: 20px; flex-wrap: wrap;">
+        <div
+          style="flex: 1; min-width: 200px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <div style="font-size: 30px; margin-bottom: 10px;">🖥️</div>
+          <div>Browser</div>
+          <div style="color: #2ecc71; font-weight: 600;">Working</div>
         </div>
 
-        <div class="status-box">
-          <div class="status-icon">☁️</div>
-          <div class="status-label">Hellfire Gateway</div>
-          <div class="status-state working">Working</div>
+        <div
+          style="flex: 1; min-width: 200px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <div style="font-size: 30px; margin-bottom: 10px;">☁️</div>
+          <div>Hellfire Gateway</div>
+          <div style="color: #2ecc71; font-weight: 600;">Working</div>
         </div>
 
-        <div class="status-box">
-          <div class="status-icon">🖥️</div>
-          <div class="status-label">Host</div>
-          <div class="status-state error">Summoning...</div>
+        <div
+          style="flex: 1; min-width: 200px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <div style="font-size: 30px; margin-bottom: 10px;">🖥️</div>
+          <div>Host</div>
+          <div style="color: #e74c3c; font-weight: 600;">Summoning...</div>
         </div>
       </div>
 
-      <div class="info-section">
+      <div style="margin-top: 30px;">
         <h2>What happened?</h2>
         <p>The underworld server is testing your identity.</p>
       </div>
 
-      <div class="info-section">
+      <div style="margin-top: 30px;">
         <h2>What can I do?</h2>
         <p>If you are a devil, confirm below.</p>
       </div>
 
-      <div class="devil-checkpoint">
-        <label class="devil-label">
-          <input type="checkbox" id="devilCheck" class="devil-checkbox">
-          <span>If you are a devil, check this box and press Enter.</span>
+      <div
+        style="margin-top: 30px; padding: 20px; border: 3px solid black; border-radius: 50px; display: inline-block;">
+        <label>
+          <input type="checkbox" id="devilCheck">
+          If you are a devil, check this box and press Enter.
         </label>
         <br>
-        <button id="enterBtn" class="devil-btn">Enter</button>
+        <button id="enterBtn"
+          style="margin-top: 20px; padding: 10px 25px; font-size: 16px; border: none; background: black; color: white; border-radius: 6px; cursor: pointer;">Enter</button>
       </div>
 
-      <div class="gate-footer">
-        Hellfire Ray ID: <span id="rayId"></span><br>
+      <div style="margin-top: 40px; font-size: 12px; color: #888;">
+        Hellfire Ray ID: <span id="rayId">666-DEVIL-001</span><br>
         Your Soul ID: ********
       </div>
     </div>

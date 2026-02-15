@@ -636,26 +636,18 @@ rainTargetTextAlpha = 0.34;
 rainClearAlpha = 0.08;
 rainTargetClearAlpha = 0.08;
 
-// Entrance Gate Logic (Simple 666 Version)
-const gateOverlay = document.getElementById('gateOverlay');
+// Entrance Gate Logic (User's Original)
 const enterBtn = document.getElementById('enterBtn');
 const devilCheck = document.getElementById('devilCheck');
-const rayIdDisplay = document.getElementById('rayId');
+const gateOverlay = document.getElementById('gateOverlay');
 
-// Generate Hellfire Ray ID
-if (rayIdDisplay) {
-  rayIdDisplay.textContent = '666-DEVIL-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-}
-
-// Enter button click handler
-if (enterBtn && gateOverlay) {
+if (enterBtn) {
   enterBtn.addEventListener('click', () => {
     if (devilCheck && devilCheck.checked) {
-      // Fade out overlay
+      // Fade out and enter
       gateOverlay.style.opacity = '0';
-      gateOverlay.style.pointerEvents = 'none';
+      gateOverlay.style.transition = 'opacity 0.6s ease';
 
-      // Start main site intro
       setTimeout(() => {
         gateOverlay.style.display = 'none';
         rainTargetTextAlpha = 0.18;
@@ -670,7 +662,7 @@ if (enterBtn && gateOverlay) {
 
 // Enter key support
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && gateOverlay.style.display !== 'none') {
+  if (event.key === 'Enter' && gateOverlay && gateOverlay.style.display !== 'none') {
     if (enterBtn) enterBtn.click();
   }
 });
