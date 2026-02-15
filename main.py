@@ -144,24 +144,12 @@ async def dice_comment_endpoint(request: DiceCommentRequest):
 @app.get("/")
 async def read_root():
     """
-    루트 경로 요청 시 gateway.html (666 entrance) 반환.
-    
-    Returns:
-        FileResponse: gateway.html 파일
-    """
-    logger.info("Serving gateway.html (666 entrance)")
-    return FileResponse("gateway.html")
-
-@app.get("/index.html")
-async def read_index():
-    """
-    메인 사이트 (index.html) 반환.
-    Gateway 통과 후 리다이렉트되는 페이지.
+    루트 경로 요청 시 index.html 반환.
     
     Returns:
         FileResponse: index.html 파일
     """
-    logger.info("Serving index.html (main site)")
+    logger.info("Serving index.html")
     return FileResponse("index.html")
 
 # Static files mapping
