@@ -1,0 +1,9 @@
+# Cursor Global Rules
+
+Follow the same guidelines as the project's agent rules.
+
+1. **Rule Awareness**: Read files in `.agent/rules/` before any major action.
+2. **Security First**: Never hardcode API keys. Always use environment variables.
+3. **Documentation Sync**: Update `SYSTEM_DOCS.md` and `MAINTENANCE.md` when infrastructure changes.
+4. **Style**: Follow the CHB documentation style (checklists, mermaid, dividers).
+5. **Transparency**: Always explain WHAT changed and WHY.
