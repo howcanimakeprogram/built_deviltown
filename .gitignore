@@ -1,4 +1,5 @@
 .env
+.DS_Store
 __pycache__/
 *.pyc
 *.pyo
@@ -12,4 +13,5 @@ build/
 cloudflared.exe
 Logs/
 *.zip
-setup_env.ps1
+# Case-insensitive pattern for setup_env.ps1
+[Ss][Ee][Tt][Uu][Pp]_[Ee][Nn][Vv].ps1

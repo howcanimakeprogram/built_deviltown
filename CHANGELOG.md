@@ -2,7 +2,27 @@
 
 이 프로젝트의 모든 주요 변경 사항은 이 파일에 기록됩니다.
 
-## [Unreleased]
+## [1.3.0] - 2026-02-16
+### 추가됨 (Added)
+- `/calendar/events` 응답 캐시(`CALENDAR_CACHE_TTL_SECONDS`) 추가
+- `/chat`, `/dice-comment`, `/calendar/events` IP 기준 레이트 리밋 추가
+- `RUNBOOK.md` 신규 추가 (장애 대응 절차/체크리스트)
+- `VERSION` 파일 + `APP_VERSION` 기반 버전 식별 추가
+- `GET /meta/version` 운영 점검 API 추가
+- `.env.example` 템플릿 파일 추가
+
+### 변경됨 (Changed)
+- Schedule 이벤트 카드 표시를 `제목 + 시간`만 출력하도록 단순화
+- 외부 새 탭 링크에 `rel=\"noopener noreferrer\"` 적용
+- API 에러 응답을 내부 예외 문자열 직접 노출 없이 일반화
+- `README.md`, `SYSTEM_DOCS.md`, `MAINTENANCE.md`를 최신 운영 설정에 맞게 동기화
+- 요청 로그에 상태코드 반영, 응답 헤더에 `X-Request-ID`/`X-App-Version` 추가
+- 파일 로그를 `RotatingFileHandler`로 변경 (`LOG_MAX_BYTES`, `LOG_BACKUP_COUNT`)
+- 미사용 레거시 파일(`js/script.js`, `debug_windows.py`)과 생성 산출물(`__pycache__`, `.DS_Store`) 정리
+
+### 보안 (Security)
+- 로그에서 API 키 접두사 출력 제거
+- 채팅 입력 원문 로그를 제거하고 길이/히스토리 개수만 기록
 
 ## [1.2.2] - 2026-02-15
 ### 추가됨 (Added)
@@ -39,5 +59,5 @@
 
 ## [1.0.0] - 2026-02-14
 ### 추가됨 (Added)
-- Devil Town 러닝 코치 웹사이트 최초 릴리즈.
-- 주요 기능: 해골 주사위 게임(Skull Game), AI 코치 채팅, 스케줄 관리, 아카이브, 믹스셋.
+- DevilTown 웹사이트 최초 릴리즈.
+- 주요 기능: 해골 주사위 게임(Skull Game), Devil Coach 채팅 메뉴, 스케줄, 아카이브, 믹스셋.

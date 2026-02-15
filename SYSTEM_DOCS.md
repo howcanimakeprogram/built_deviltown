@@ -1,4 +1,4 @@
-# Devil Town Running Coach - 시스템 전체 문서
+# DEVILTOWN WEBSITE - 시스템 전체 문서
 
 ## 📚 목차
 1. [시스템 개요](#시스템-개요)
@@ -9,20 +9,27 @@
 6. [페르소나 커스터마이징](#페르소나-커스터마이징)
 7. [트러블슈팅](#트러블슈팅)
 8. [유지보수](#유지보수)
+9. [운영 런북](#운영-런북)
 
 ---
 
 ## 시스템 개요
 
 ### 프로젝트 목적
-Devil Town 웹사이트에 통합된 AI 러닝 코치로, 사용자에게 거친 욕설과 팩트 폭격을 통해 동기부여를 제공합니다.
+DevilTown 다크 테마 웹사이트를 운영하기 위한 구조/설정/운영 절차를 문서화합니다.  
+이 사이트는 러닝, 음악, 그래픽 요소를 결합한 다크 테마 기반의 커뮤니티 공간이며, 다양한 인터랙티브 메뉴를 통해 콘텐츠를 제공합니다.
 
 ### 핵심 기능
-- 🚪 **인트로 대문 (Error 666)**: "Bad gateway" 패러디 디자인으로 체크박스 인증 후 입장
-- 💬 **실시간 채팅**: 대화 히스토리를 유지하며 자연스러운 대화
-- 🎭 **페르소나**: "방구석 여포" 스타일의 키보드 워리어 코치
-- 🎨 **아스키 아트**: 재미있는 이모티콘으로 응답 강화
-- 🏃 **전문 조언**: 러닝 자세, 장비, 부상 관리 등 실용적 정보
+- 🚪 **인트로 대문 (Error 666)**: "Bad gateway" 패러디 디자인으로 체크박스 인증 후 입장하는 게이트웨이 시스템
+- 🗂️ **메뉴 기반 통합 콘텐츠**:
+    - **Schedule**: iCloud 캘린더 연동 실시간 일정 정보 제공
+    - **Archive**: 사진, 영상, 그래픽 실험물 등 시각적 아카이브
+    - **Mixes**: DJ 믹스셋 및 플레이리스트 공유
+    - **Marathoner**: 마라토너의 상세 정보 및 러닝 로그 기록
+    - **Skull Dice**: 운명을 결정하는 주사위 게임 기반의 러닝 거리 추천
+    - **Devil Coach**: "방구석여포" 페르소나를 가진 AI와의 인터랙티브 채팅
+    - **WTFIS**: 로고, 티셔츠, 포스터 등 그래픽 실험 피드
+- 🎨 **비주얼 시스템**: ASCII 아트, 노이즈, 글리치 효과 중심의 DevilTown 고유 테마
 
 ### 기술 스택
 ```
@@ -64,12 +71,15 @@ graph TD
 | **개발 (Development)** | 맥북 프로 | macOS | M-Series / 16GB+ RAM | 로컬 개발 | `/Users/chaehyeonbyeongsin/Desktop/코딩/데빌타운 웹사이트` |
 
 ### 데이터 흐름
-1. **사용자 입력** → `coachInput` 필드에 메시지 입력
-2. **프론트엔드** → `devil_coach_chat.js`가 `/chat`으로 POST 요청
-3. **백엔드** → `main.py`가 요청 수신 및 검증
-4. **AI 처리** → Gemini API에 시스템 프롬프트 + 히스토리 + 메시지 전달
-5. **응답 생성** → AI가 페르소나에 맞는 응답 생성
-6. **프론트엔드** → 응답을 채팅창에 표시
+1. **정적 콘텐츠 서빙**: FastAPI가 `index.html`, `css`, `js` 파일을 브라우저에 전달
+2. **동적 데이터 요청**: 프론트엔드(`navigation_feeds.js`)가 백엔드 API 호출
+3. **일정 데이터 (Schedule)**: 백엔드가 iCloud ICS를 파싱하여 JSON으로 반환
+4. **AI 채팅 (Devil Coach)**:
+    - 사용자 입력 → `/chat` POST 요청
+    - 백엔드 → Gemini API 호출 (시스템 프롬프트 + 요청에 포함된 최근 문맥)
+    - 주의: 히스토리는 요청 처리용이며 서버에 사용자별 영구 저장하지 않음
+    - AI 응답 → 프론트엔드에 전달 및 렌더링
+5. **주사위 게임 (Skull Dice)**: 결과에 따른 맞춤형 코멘트를 AI가 생성하여 전달
 
 ---
 
@@ -98,15 +108,27 @@ pip install -r requirements.txt
 ```
 
 **설치되는 패키지**:
-- `fastapi==0.104.1`: 웹 프레임워크
-- `uvicorn==0.24.0`: ASGI 서버
-- `google-generativeai==0.3.1`: Gemini API 클라이언트
-- `python-dotenv==1.0.0`: 환경 변수 관리
+- `fastapi`: 웹 프레임워크
+- `uvicorn`: ASGI 서버
+- `google-generativeai`: Gemini API 클라이언트
+- `python-dotenv`: 환경 변수 관리
 
 ### 3. API 키 설정
-`.env` 파일을 생성하고 Google Gemini API 키를 입력하세요:
+`.env` 파일을 생성하고 아래 값을 설정하세요:
 ```env
 GOOGLE_API_KEY=your_actual_api_key_here
+ICLOUD_CALENDAR_ICS_URL=https://p44-caldav.icloud.com/published/2/...
+RATE_LIMIT_WINDOW_SECONDS=60
+CHAT_RATE_LIMIT_PER_WINDOW=60
+DICE_RATE_LIMIT_PER_WINDOW=120
+CALENDAR_RATE_LIMIT_PER_WINDOW=30
+MAX_CHAT_MESSAGE_LENGTH=500
+MAX_CHAT_HISTORY_ITEMS=24
+CALENDAR_CACHE_TTL_SECONDS=120
+CORS_ALLOWED_ORIGINS=https://welcometodeviltown.com,https://www.welcometodeviltown.com
+APP_VERSION=1.3.0
+LOG_MAX_BYTES=5242880
+LOG_BACKUP_COUNT=10
 ```
 
 API 키는 [Google AI Studio](https://aistudio.google.com/)에서 발급받을 수 있습니다.
@@ -154,20 +176,27 @@ PC가 켜질 때 서버를 자동으로 시작하려면 다음 단계를 수행�
 
 ## 사용 방법
 
-### 웹 인터페이스 접속
-1. 브라우저에서 `https://www.welcometodeviltown.com` 접속 (또는 로컬 `http://127.0.0.1:8000`)
-2. 우측 상단 **MENU** 버튼 클릭
-3. **Devil Coach (AI)** 선택
+### 웹 인터페이스 접속 및 메뉴 이용
+1. 브라우저에서 `https://www.welcometodeviltown.com` 접속
+2. 인트로 화면에서 체크박스 확인 후 **Enter** 클릭
+3. 우측 상단 **MENU** 버튼을 클릭하여 원하는 메뉴 선택:
+    - **Schedule**: 현재 진행 중이거나 예정된 세션 확인
+    - **Archive**: 테마별 태그를 클릭하여 사진/영상 필터링
+    - **Mixes**: Soundcloud나 YouTube 기반의 믹스셋 감상
+    - **Skull Dice**: 주사위를 굴려 오늘 뛸 거리 정하기
+    - **Devil Coach**: AI 코치에게 팩트 폭격 받으며 상담하기
+
+### 콘텐츠 필터링 (Feed)
+- Archive, Mixes 등 피드 섹션 상단의 **태그 버튼**을 클릭하여 관심 있는 카테고리만 골라 볼 수 있습니다.
 
 ### SKULL Dice 게임
-1. 메인 화면의 **ROLL THE SKULL DICE** 버튼 클릭
-2. 버튼 하단에서 주사위 애니메이션과 결과 확인
-3. AI 코치가 거리에 따른 맞춤형 코멘트 제공
+1. **🎲 SKULL Dice** 메뉴 선택 또는 메인 화면의 버튼 클릭
+2. 버튼 하단에서 주사위 결과와 AI 코치의 맞춤형 한마디 확인
 
-### 채팅 시작
-- 입력창에 메시지 입력
-- **Enter** 키 또는 **보내기** 버튼 클릭
-- AI 응답 대기 (보통 2-5초)
+### AI 채팅 (Devil Coach)
+- 입력창에 질문이나 푸념을 입력하고 **Enter** 또는 **보내기** 클릭
+- AI의 찰진 응답을 확인 (내용에 따라 2~5초 소요)
+- 대화 문맥은 현재 페이지 세션 기준으로만 유지되며, 서버에 사용자별 대화 로그를 저장하지 않음
 
 ---
 
@@ -194,6 +223,10 @@ PC가 켜질 때 서버를 자동으로 시작하려면 다음 단계를 수행�
 }
 ```
 
+**참고**:
+- `history`는 클라이언트가 요청마다 보내는 문맥 데이터입니다.
+- 백엔드는 이를 sanitize 후 해당 요청 처리에만 사용하며, 사용자별 히스토리를 DB/파일에 영구 저장하지 않습니다.
+
 **Response**:
 ```json
 {
@@ -218,6 +251,63 @@ PC가 켜질 때 서버를 자동으로 시작하려면 다음 단계를 수행�
   "comment": "지옥주 시작이다! 30km LSD 실시! 토나올 때까지!"
 }
 ```
+
+### GET /calendar/events
+
+**Endpoint**: `/calendar/events`
+
+**Description**:
+- 서버가 iCloud 공개 ICS를 조회/파싱해서 일정 목록을 JSON으로 반환합니다.
+- 캘린더 API는 서버 측 캐시(`CALENDAR_CACHE_TTL_SECONDS`)를 사용합니다.
+
+**Response**:
+```json
+{
+  "source": "icloud",
+  "count": 2,
+  "events": [
+    {
+      "id": "event-1",
+      "title": "DEVILTOWN SESSION",
+      "start": "2026-02-20T19:00:00+09:00",
+      "end": "2026-02-20T22:00:00+09:00",
+      "all_day": false,
+      "location": "Seoul",
+      "notes": "",
+      "categories": ["dj", "night"]
+    }
+  ]
+}
+```
+
+### GET /meta/version
+
+**Endpoint**: `/meta/version`
+
+**Description**:
+- 운영 점검용 버전/기동 메타 정보를 반환합니다.
+
+**Response**:
+```json
+{
+  "app_version": "1.3.0",
+  "started_at": "2026-02-16T04:00:00+00:00",
+  "log_file": "Logs/server.log"
+}
+```
+
+### Rate Limit (공통)
+
+- `POST /chat`: `CHAT_RATE_LIMIT_PER_WINDOW` 회 / `RATE_LIMIT_WINDOW_SECONDS` 초
+- `POST /dice-comment`: `DICE_RATE_LIMIT_PER_WINDOW` 회 / `RATE_LIMIT_WINDOW_SECONDS` 초
+- `GET /calendar/events`: `CALENDAR_RATE_LIMIT_PER_WINDOW` 회 / `RATE_LIMIT_WINDOW_SECONDS` 초
+
+한도를 넘기면 `429 Too Many Requests`와 `Retry-After` 헤더를 반환합니다.
+
+### Response Headers (운영 추적)
+
+- `X-Request-ID`: 요청 단위 추적 ID (로그 `job_id`와 매핑)
+- `X-App-Version`: 현재 실행 중인 백엔드 버전
 
 ---
 
@@ -272,6 +362,14 @@ taskkill /F /IM python.exe
 - [ ] `pip list --outdated`로 Python 패키지 최신화 여부 확인
 - [ ] 로그 파일 용량이 너무 크지 않은지 확인 (필요시 삭제)
 
+---
+
+## 운영 런북
+
+실시간 장애 대응 절차는 별도 문서에서 관리합니다.
+
+- [`RUNBOOK.md`](RUNBOOK.md): 429/500/503/포트충돌 대응, 복구 체크리스트
+
 ### 파일 구조 상세
 
 ```
@@ -284,6 +382,7 @@ taskkill /F /IM python.exe
 │
 ├── system_prompt.md           # AI 페르소나 정의
 ├── .env                       # 환경 변수 (API 키)
+├── VERSION                    # 배포 버전 문자열
 ├── requirements.txt           # Python 의존성
 ├── SETUP_ENV.ps1              # [설치용] 환경 변수 및 파이썬 경로 자동 설정
 ├── setup_autostart.ps1        # [설치용] 윈도우 시작 시 자동 실행 등록 스크립트
@@ -291,6 +390,7 @@ taskkill /F /IM python.exe
 ├── cloudflared.exe            # [실행용] Cloudflare Tunnel 클라이언트 (단독 실행 파일)
 ├── README.md                  # 프로젝트 설명
 ├── SYSTEM_DOCS.md             # 시스템 전체 문서 (본 파일)
+├── RUNBOOK.md                 # 운영/장애 대응 실행 가이드
 │
 ├── index.html                 # 메인 HTML
 │
@@ -298,11 +398,15 @@ taskkill /F /IM python.exe
 │   └── style.css              # 스타일시트
 │
 ├── js/
-│   ├── script.js              # 메인 로직 (Dice, UI)
+│   ├── visuals.js             # 배경/ASCII/스크램블
+│   ├── navigation_feeds.js    # 메뉴/모달/피드 렌더링
+│   ├── game_video.js          # Dice/비디오 모달
+│   ├── boot_gate.js           # 인트로/게이트 초기화
 │   └── devil_coach_chat.js    # 채팅 로직
 │
 └── Logs/                      # 서버 로그 (Windows 전용)
-    └── server.log             # 실행 및 에러 로그
+    ├── server.log             # 현재 로그
+    └── server.log.N           # 롤링 백업 로그
 ```
 
 ---
@@ -313,5 +417,6 @@ taskkill /F /IM python.exe
 1. GitHub Issues 등록
 2. 프로젝트 관리자에게 연락
 3. `system_prompt.md` 직접 수정 후 PR
+4. 걍 발바닥 벅벅 긁고 잠자기
 
 **Happy Running! 🏃‍♂️💨**
