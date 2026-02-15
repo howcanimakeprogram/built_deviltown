@@ -122,7 +122,7 @@ async def dice_comment_endpoint(request: DiceCommentRequest):
         model = genai.GenerativeModel("gemini-2.0-flash")
         
         prompt = (
-            f"너는 'Devil Coach'라는 아주 무례하고 독설을 내뱉는 악마 코치다. "
+            f"너는 'Devil Coach'라는 아주 무례하고 독설을 내뱉는 방구석 여포 겸 코치다. "
             f"사용자가 주사위를 굴려서 '{request.distance}'라는 거리가 나왔다. "
             f"다음 규칙에 따라 아주 짧고 강렬한 한 마디를 반말로 내뱉어라:\n"
             f"1. 마크다운 기호를 절대 사용하지 마라.\n"

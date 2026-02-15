@@ -636,8 +636,31 @@ rainTargetTextAlpha = 0.34;
 rainClearAlpha = 0.08;
 rainTargetClearAlpha = 0.08;
 
-setTimeout(() => {
-  rainTargetTextAlpha = 0.18;
-  rainTargetClearAlpha = 0.18;
-  play();
-}, 2500);
+// Entrance Gate Logic
+const gateOverlay = document.getElementById('gateOverlay');
+const enterBtn = document.getElementById('enterBtn');
+
+if (enterBtn && gateOverlay) {
+  enterBtn.addEventListener('click', () => {
+    // 1. Play sound effect (optional/future)
+    // 2. Animate out
+    gateOverlay.style.opacity = '0';
+    gateOverlay.style.transform = 'scale(1.5)';
+    gateOverlay.style.pointerEvents = 'none';
+
+    // 3. Start the intro sequence after small delay
+    setTimeout(() => {
+      gateOverlay.style.display = 'none';
+      rainTargetTextAlpha = 0.18;
+      rainTargetClearAlpha = 0.18;
+      play(); // The original start function
+    }, 800);
+  });
+} else {
+  // Fallback if gate is missing
+  setTimeout(() => {
+    rainTargetTextAlpha = 0.18;
+    rainTargetClearAlpha = 0.18;
+    play();
+  }, 2500);
+}
