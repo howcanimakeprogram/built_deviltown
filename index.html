@@ -12,20 +12,57 @@
 
   <canvas id="noise"></canvas>
 
-  <!-- Entrance Gate -->
+  <!-- Entrance Gate (Devil 666 - Simple Version) -->
   <div id="gateOverlay">
-    <div class="gate-content">
-      <div class="gate-warning">WARNING: BIOHAZARD</div>
-      <h1 class="gate-title">DEVIL TOWN</h1>
-      <p class="gate-desc">
-        이곳은 악마들의 구역입니다.<br>
-        멘탈이 약하거나 노약자는 뒤로가기를 눌러주세요.
-      </p>
-      <button id="enterBtn" class="gate-btn">
-        <span class="btn-text">👿 ENTER IF YOU DARE 👿</span>
-        <div class="btn-glitch"></div>
-      </button>
-      <div class="gate-footer">입장 시 영혼 판매에 동의하는 것으로 간주합니다.</div>
+    <div class="gate-container">
+      <h1>
+        Bad gateway
+        <span class="error-badge">Error code 666</span>
+      </h1>
+
+      <div class="status-row">
+        <div class="status-box">
+          <div class="status-icon">🖥️</div>
+          <div class="status-label">Browser</div>
+          <div class="status-state working">Working</div>
+        </div>
+
+        <div class="status-box">
+          <div class="status-icon">☁️</div>
+          <div class="status-label">Hellfire Gateway</div>
+          <div class="status-state working">Working</div>
+        </div>
+
+        <div class="status-box">
+          <div class="status-icon">🖥️</div>
+          <div class="status-label">Host</div>
+          <div class="status-state error">Summoning...</div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h2>What happened?</h2>
+        <p>The underworld server is testing your identity.</p>
+      </div>
+
+      <div class="info-section">
+        <h2>What can I do?</h2>
+        <p>If you are a devil, confirm below.</p>
+      </div>
+
+      <div class="devil-checkpoint">
+        <label class="devil-label">
+          <input type="checkbox" id="devilCheck" class="devil-checkbox">
+          <span>If you are a devil, check this box and press Enter.</span>
+        </label>
+        <br>
+        <button id="enterBtn" class="devil-btn">Enter</button>
+      </div>
+
+      <div class="gate-footer">
+        Hellfire Ray ID: <span id="rayId"></span><br>
+        Your Soul ID: ********
+      </div>
     </div>
   </div>
 
@@ -360,60 +397,8 @@
               <pre class="runSkull"></pre>
             </div>
           </div>
-          <!-- Entrance Gate (Devil 666 - Simple Version) -->
-          <div id="gateOverlay">
-            <div class="gate-container">
-              <h1>
-                Bad gateway
-                <span class="error-badge">Error code 666</span>
-              </h1>
-
-              <div class="status-row">
-                <div class="status-box">
-                  <div class="status-icon">🖥️</div>
-                  <div class="status-label">Browser</div>
-                  <div class="status-state working">Working</div>
-                </div>
-
-                <div class="status-box">
-                  <div class="status-icon">☁️</div>
-                  <div class="status-label">Hellfire Gateway</div>
-                  <div class="status-state working">Working</div>
-                </div>
-
-                <div class="status-box">
-                  <div class="status-icon">🖥️</div>
-                  <div class="status-label">Host</div>
-                  <div class="status-state error">Summoning...</div>
-                </div>
-              </div>
-
-              <div class="info-section">
-                <h2>What happened?</h2>
-                <p>The underworld server is testing your identity.</p>
-              </div>
-
-              <div class="info-section">
-                <h2>What can I do?</h2>
-                <p>If you are a devil, confirm below.</p>
-              </div>
-
-              <div class="devil-checkpoint">
-                <label class="devil-label">
-                  <input type="checkbox" id="devilCheck" class="devil-checkbox">
-                  <span>If you are a devil, check this box and press Enter.</span>
-                </label>
-                <br>
-                <button id="enterBtn" class="devil-btn">Enter</button>
-              </div>
-
-              <div class="gate-footer">
-                Hellfire Ray ID: <span id="rayId"></span><br>
-                Your Soul ID: ********
-              </div>
-            </div>
-          </div>
           <div class="card">
+
             <div><b>Race #3</b> · 10K · 00:00:00</div>
             <div class="small">YYYY-MM-DD · Location</div>
             <div class="run-photo">
