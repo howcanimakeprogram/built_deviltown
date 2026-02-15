@@ -665,25 +665,36 @@ body.video-open #videoModal {
   font-weight: bold;
 }
 
-/* ===== Entrance Gate ===== */
+/* ===== Entrance Gate (Matrix/Cyberpunk Style) ===== */
 #gateOverlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 9999;
-  background: #000;
-  display: flex;
+  background-color: #000;
+  /* Fallback */
+  background: rgba(0, 0, 0, 0.95);
+  display: flex !important;
+  /* Force display */
   justify-content: center;
   align-items: center;
   text-align: center;
-  transition: opacity 1s ease, transform 1s ease;
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 .gate-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
-  animation: gateFloat 3s ease-in-out infinite;
+  gap: 25px;
+  max-width: 90%;
+  animation: gateFloat 4s ease-in-out infinite;
+  border: 1px solid rgba(255, 0, 0, 0.2);
+  padding: 40px;
+  background: rgba(10, 0, 0, 0.8);
+  box-shadow: 0 0 50px rgba(255, 0, 0, 0.1);
 }
 
 @keyframes gateFloat {
@@ -694,81 +705,102 @@ body.video-open #videoModal {
   }
 
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
   }
 }
 
 .gate-warning {
   color: #ff0000;
+  font-family: 'Courier New', monospace;
   font-weight: bold;
-  letter-spacing: 0.2em;
-  font-size: 14px;
-  border: 1px solid #ff0000;
-  padding: 5px 10px;
-  background: rgba(255, 0, 0, 0.1);
-  animation: blink 0.5s step-end infinite alternate;
+  letter-spacing: 0.3em;
+  font-size: 16px;
+  border: 2px solid #ff0000;
+  padding: 8px 16px;
+  background: rgba(255, 0, 0, 0.15);
+  text-transform: uppercase;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+  animation: warningBlink 0.2s infinite alternate;
 }
 
-@keyframes blink {
-  50% {
-    opacity: 0;
+@keyframes warningBlink {
+  0% {
+    opacity: 0.8;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.2);
+  }
+
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
   }
 }
 
 .gate-title {
-  font-size: 4rem;
+  font-size: clamp(3rem, 8vw, 6rem);
   font-weight: 900;
   color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 4px 4px 0px #ff0000;
+  text-transform: uppercase;
   margin: 0;
   letter-spacing: -2px;
+  text-shadow: 4px 4px 0px #ff0000;
+  font-family: sans-serif;
+  line-height: 1;
 }
 
 .gate-desc {
-  color: #aaa;
-  font-size: 14px;
+  color: #ccc;
+  font-size: 1.1rem;
   line-height: 1.6;
+  font-family: monospace;
 }
 
+/* Kitsch Glitch Button */
 .gate-btn {
   position: relative;
-  margin-top: 20px;
-  background: transparent;
+  margin-top: 30px;
+  background: #000;
   border: 2px solid #fff;
   color: #fff;
-  padding: 20px 40px;
+  padding: 20px 50px;
   font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: 900;
+  text-transform: uppercase;
   cursor: pointer;
   overflow: hidden;
   transition: all 0.2s;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  box-shadow: 5px 5px 0px #ff0000;
 }
 
 .gate-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0px #ff0000;
   background: #fff;
   color: #000;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.6), 0 0 10px #ff0000;
-  transform: scale(1.05);
 }
 
 .gate-btn:active {
-  transform: scale(0.95);
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #ff0000;
+}
+
+.gate-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.4), transparent);
+  transition: 0.5s;
+}
+
+.gate-btn:hover::before {
+  left: 100%;
 }
 
 .gate-footer {
-  margin-top: 30px;
-  font-size: 10px;
-  color: #444;
-}
-
-@media (max-width: 600px) {
-  .gate-title {
-    font-size: 3rem;
-  }
-
-  .gate-btn {
-    padding: 15px 30px;
-    font-size: 1rem;
-  }
+  margin-top: 40px;
+  font-size: 0.8rem;
+  color: #666;
+  font-family: monospace;
 }
